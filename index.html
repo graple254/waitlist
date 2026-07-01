@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>chichi — meet a stranger, then beat them at something</title>
+<meta name="description" content="Chichi is live video & text chat with real multiplayer games built in. Match with a stranger, then challenge them to tic tac toe, checkers, sudoku or 3 men's morris — live.">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --cream:#FFF8EF;
+    --ink:#241B2F;
+    --coral:#FF6B57;
+    --mint:#2FC7AE;
+    --sunny:#FFC64B;
+    --lilac:#C9B6FF;
+    --card:#FFFFFF;
+    --line:#EFE4D2;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle, #EFE1CC 1px, transparent 1.4px) 0 0/26px 26px,
+      var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  h1,.display-font{font-family:'Baloo 2',cursive;}
+
+  /* ---------- NAV ---------- */
+  .navbar-chichi{
+    padding:1rem clamp(1.25rem,4vw,3.5rem) 0;
+    flex-shrink:0;
+  }
+  .logo{
+    font-family:'Baloo 2',cursive;
+    font-weight:800;
+    font-size:1.45rem;
+    color:var(--ink);
+  }
+  .logo span.dot{color:var(--coral);}
+  .beta-badge{
+    font-family:'Inter',sans-serif;
+    font-size:.62rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    background:var(--lilac);
+    color:var(--ink);
+    padding:.15rem .5rem;
+    border-radius:999px;
+    vertical-align:middle;
+    margin-left:.4rem;
+  }
+  .btn-notify-nav{
+    background:var(--ink);
+    color:var(--cream);
+    border:none;
+    border-radius:999px;
+    padding:.5rem 1.15rem;
+    font-weight:600;
+    font-size:.82rem;
+  }
+  .btn-notify-nav:hover{background:var(--coral); color:var(--ink);}
+
+  /* ---------- HERO ---------- */
+  .hero-wrap{
+    flex:1 1 auto;
+    display:flex;
+    align-items:center;
+    padding:clamp(.75rem,2vh,1.5rem) clamp(1.25rem,4vw,3.5rem);
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--coral);
+    font-weight:600;
+    font-size:.76rem;
+    padding:.32rem .75rem;
+    border-radius:999px;
+    margin-bottom:.85rem;
+  }
+
+  h1.headline{
+    font-size:clamp(1.7rem,3.2vw,2.85rem);
+    font-weight:800;
+    line-height:1.1;
+    margin-bottom:.7rem;
+  }
+  h1.headline .hl{
+    color:var(--coral);
+    position:relative;
+    white-space:nowrap;
+  }
+  h1.headline .hl svg{
+    position:absolute;
+    left:0; bottom:-.14em;
+    width:100%; height:.3em;
+  }
+
+  .lead-copy{
+    font-size:clamp(.9rem,1.05vw,1.02rem);
+    color:#5B5064;
+    max-width:32rem;
+    margin-bottom:1.1rem;
+  }
+  .lead-copy strong{color:var(--ink);}
+
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+    margin-bottom:1.2rem;
+  }
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:.32rem .7rem;
+    font-size:.75rem;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .chip i{font-size:.82rem; color:var(--mint);}
+  .chip.game i{color:var(--coral);}
+
+  .email-form{
+    display:flex;
+    gap:.5rem;
+    max-width:25rem;
+  }
+  .email-form input{
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    padding:.6rem 1.05rem;
+    font-size:.88rem;
+    flex:1;
+  }
+  .email-form input:focus{
+    box-shadow:0 0 0 3px rgba(255,107,87,.18);
+    border-color:var(--coral);
+    outline:none;
+  }
+  .btn-cta{
+    background:var(--coral);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:.6rem 1.3rem;
+    font-weight:700;
+    font-size:.88rem;
+    white-space:nowrap;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn-cta:hover{background:#ff5540; transform:translateY(-1px);}
+  .btn-cta:disabled{opacity:.7; transform:none;}
+
+  .form-note{
+    font-size:.74rem;
+    color:#9A8FA3;
+    margin-top:.55rem;
+  }
+  .form-note a{color:var(--mint); text-decoration:none; font-weight:600;}
+  .form-note a:hover{text-decoration:underline;}
+
+  .form-status{
+    font-size:.8rem;
+    font-weight:600;
+    margin-top:.5rem;
+    min-height:1.1em;
+  }
+  .form-status.ok{color:var(--mint);}
+  .form-status.err{color:var(--coral);}
+
+  /* ---------- SIGNATURE: LIVE PLAYABLE DEMO ---------- */
+  .demo-col{
+    display:flex;
+    justify-content:center;
+  }
+  .call-card{
+    width:min(370px,100%);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:24px;
+    box-shadow:0 26px 55px -22px rgba(36,27,47,.3);
+    transform:rotate(-1.3deg);
+    padding:1rem 1.1rem 1.1rem;
+  }
+  .browser-topbar{
+    display:flex;
+    gap:.32rem;
+    margin-bottom:.75rem;
+  }
+  .browser-topbar span{width:8px;height:8px;border-radius:50%;background:var(--line);}
+  .browser-topbar span:nth-child(1){background:var(--coral);}
+  .browser-topbar span:nth-child(2){background:var(--sunny);}
+  .browser-topbar span:nth-child(3){background:var(--mint);}
+
+  .participants{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.6rem;
+    margin-bottom:.4rem;
+  }
+  .avatar{
+    width:44px;height:44px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.25rem;
+    position:relative;
+    flex-shrink:0;
+  }
+  .avatar.you{background:#FFEADB; color:var(--coral);}
+  .avatar.stranger{background:#E4F7F3; color:var(--mint);}
+  .avatar .dot{
+    position:absolute; top:0; right:0;
+    width:9px;height:9px;border-radius:50%;
+    background:#3ecf6a; border:2px solid #fff;
+  }
+  .link-line{
+    flex:1;
+    max-width:60px;
+    height:0;
+    border-top:2px dashed var(--line);
+  }
+
+  .matched-tag{
+    text-align:center;
+    font-size:.72rem;
+    font-weight:700;
+    color:#8A7F92;
+    margin-bottom:.7rem;
+  }
+
+  .game-panel{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:.85rem;
+  }
+  .game-panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:.55rem;
+  }
+  .game-panel-head .label{
+    font-size:.68rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--coral);
+    display:flex;
+    align-items:center;
+    gap:.3rem;
+  }
+  .score{
+    font-size:.72rem;
+    font-weight:700;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:.15rem .55rem;
+  }
+  .score b{color:var(--coral);}
+  .score b.o{color:var(--mint);}
+
+  .ttt-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    margin-bottom:.55rem;
+  }
+  .ttt-cell{
+    aspect-ratio:1/1;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Baloo 2',cursive;
+    font-weight:700;
+    font-size:1.35rem;
+    cursor:pointer;
+    color:var(--ink);
+    transition:background .12s ease, transform .1s ease;
+    padding:0;
+  }
+  .ttt-cell:hover:not(:disabled){background:#FFF1E6; transform:scale(1.03);}
+  .ttt-cell:disabled{cursor:default;}
+  .ttt-cell.x{color:var(--coral);}
+  .ttt-cell.o{color:var(--mint);}
+
+  .game-status{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:.5rem;
+  }
+  .game-status span{
+    font-size:.76rem;
+    color:#7A6E82;
+    font-weight:500;
+  }
+  .btn-reset{
+    background:none;
+    border:1px solid var(--line);
+    border-radius:999px;
+    width:26px;height:26px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink);
+    font-size:.8rem;
+    flex-shrink:0;
+  }
+  .btn-reset:hover{background:#fff; border-color:var(--coral); color:var(--coral);}
+
+  .try-hint{
+    text-align:center;
+    font-size:.72rem;
+    color:#9A8FA3;
+    margin-top:.65rem;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.chichi-footer{
+    flex-shrink:0;
+    text-align:center;
+    font-size:.74rem;
+    color:#A99EAF;
+    padding:.5rem 1rem 1rem;
+  }
+
+  @media (max-width:991px){
+    .demo-col{margin-top:1.5rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar-chichi d-flex justify-content-between align-items-center">
+  <div class="logo">chichi<span class="dot">.</span><span class="beta-badge">beta</span></div>
+  <button class="btn-notify-nav" onclick="document.getElementById('email').focus()">Reserve my spot</button>
+</nav>
+
+<div class="hero-wrap">
+  <div class="row align-items-center g-4 w-100">
+
+    <div class="col-lg-6">
+      <div class="eyebrow"><i class="bi bi-controller"></i> The most fun way to meet new people online</div>
+
+      <h1 class="headline">Afraid of meeting new people.<br>Then <span class="hl">break the ice with</span> board games.
+      </h1>
+
+      <p class="lead-copy">Chichi is live video &amp; text chat with real multiplayer games baked in. <strong> Whether it's Checkers, Tic Tac Toe, Sudoku or more,</strong> games make conversations natural.</p>
+
+      <div class="chip-row">
+        <span class="chip"><i class="bi bi-camera-video-fill"></i> Video chat</span>
+        <span class="chip"><i class="bi bi-chat-dots-fill"></i> Text chat</span>
+        <span class="chip game"><i class="bi bi-grid-3x3"></i> Tic Tac Toe</span>
+        <span class="chip game"><i class="bi bi-dice-5-fill"></i> Checkers</span>
+        <span class="chip game"><i class="bi bi-triangle"></i> 3 Men's Morris</span>
+        <span class="chip game"><i class="bi bi-grid-3x3-gap-fill"></i> Sudoku</span>
+      </div>
+
+      <form id="notifyForm" class="email-form" action="https://formspree.io/f/xbdvzpny" method="POST" novalidate>
+        <input type="email" name="email" id="email" required placeholder="you@example.com" aria-label="Email address">
+        <button type="submit" class="btn-cta" id="notifyBtn">Reserve my spot</button>
+      </form>
+      <div class="form-status" id="formStatus" role="status"></div>
+      <div class="form-note"><i class="bi bi-shield-check"></i> No spam, Exclusive invitations to beta play sessions and Early access before public launch. Email us directly at <a href="mailto:info@chichi.quest">info@chichi.quest</a></div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="demo-col">
+        <div class="call-card">
+          <div class="browser-topbar"><span></span><span></span><span></span></div>
+
+          <div class="participants">
+            <div class="avatar you"><i class="bi bi-emoji-sunglasses"></i><span class="dot"></span></div>
+            <div class="link-line"></div>
+            <div class="avatar stranger"><i class="bi bi-emoji-wink"></i><span class="dot"></span></div>
+          </div>
+          <div class="matched-tag">🎉 matched — say hi, then make a move</div>
+
+          <div class="game-panel">
+            <div class="game-panel-head">
+              <span class="label"><i class="bi bi-joystick"></i> Tic Tac Toe</span>
+              <span class="score">You <b id="scoreYou">0</b> · <b class="o" id="scoreStranger">0</b> Stranger</span>
+            </div>
+
+            <div class="ttt-grid" id="tttGrid"></div>
+
+            <div class="game-status">
+              <span id="gameStatus">Your move — you're ×</span>
+              <button type="button" class="btn-reset" id="resetGame" title="New game" aria-label="New game"><i class="bi bi-arrow-clockwise"></i></button>
+            </div>
+          </div>
+          <div class="try-hint">go ahead, actually click a square 👆</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="chichi-footer">Built solo, one board at a time · launching soon</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ---------- Formspree email capture ---------- */
+  const form = document.getElementById('notifyForm');
+  const btn = document.getElementById('notifyBtn');
+  const statusEl = document.getElementById('formStatus');
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(form.action.includes('YOUR_FORM_ID')){
+      statusEl.textContent = "Almost there — plug your Formspree form ID into index.html.";
+      statusEl.className = 'form-status err';
+      return;
+    }
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+    statusEl.textContent = '';
+    statusEl.className = 'form-status';
+
+    try{
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if(res.ok){
+        statusEl.textContent = "You're on the list 🎉 — see you at launch.";
+        statusEl.className = 'form-status ok';
+        form.reset();
+      } else {
+        statusEl.textContent = "Hmm, that didn't go through — try again?";
+        statusEl.className = 'form-status err';
+      }
+    } catch(err){
+      statusEl.textContent = "Network hiccup — try again in a moment.";
+      statusEl.className = 'form-status err';
+    }
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  });
+
+  /* ---------- Playable tic-tac-toe demo ---------- */
+  const gridEl = document.getElementById('tttGrid');
+  const statusText = document.getElementById('gameStatus');
+  const scoreYouEl = document.getElementById('scoreYou');
+  const scoreStrangerEl = document.getElementById('scoreStranger');
+  const resetBtn = document.getElementById('resetGame');
+
+  let board, over, scoreYou = 0, scoreStranger = 0;
+  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const STRANGER_LINES = {
+    win: ["stranger: gg 😏","stranger: rematch??","stranger: too easy 😎"],
+    lose: ["stranger: wait what 😳","stranger: ok you're good","stranger: rematch!"],
+    draw: ["stranger: well played","stranger: draw huh","stranger: again?"]
+  };
+
+  function buildGrid(){
+    gridEl.innerHTML = '';
+    for(let i=0;i<9;i++){
+      const c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'ttt-cell';
+      c.dataset.i = i;
+      c.addEventListener('click', onCellClick);
+      gridEl.appendChild(c);
+    }
+  }
+
+  function newGame(){
+    board = Array(9).fill(null);
+    over = false;
+    statusText.textContent = "Your move — you're ×";
+    [...gridEl.children].forEach(c => {
+      c.textContent = '';
+      c.className = 'ttt-cell';
+      c.disabled = false;
+    });
+  }
+
+  function checkWinner(b){
+    for(const [a,c,d] of WINS){
+      if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
+    }
+    return b.every(v => v) ? 'draw' : null;
+  }
+
+  function line(kind){
+    const arr = STRANGER_LINES[kind];
+    return arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  function endGame(winner){
+    over = true;
+    [...gridEl.children].forEach(c => c.disabled = true);
+    if(winner === 'X'){
+      scoreYou++; scoreYouEl.textContent = scoreYou;
+      statusText.textContent = "You won! " + line('lose');
+    } else if(winner === 'O'){
+      scoreStranger++; scoreStrangerEl.textContent = scoreStranger;
+      statusText.textContent = "Stranger won. " + line('win');
+    } else {
+      statusText.textContent = "Draw. " + line('draw');
+    }
+  }
+
+  function strangerMove(){
+    if(over) return;
+    const empties = board.map((v,i)=>v?null:i).filter(v=>v!==null);
+    if(!empties.length) return;
+    const i = empties[Math.floor(Math.random()*empties.length)];
+    board[i] = 'O';
+    const cell = gridEl.children[i];
+    cell.textContent = '○';
+    cell.className = 'ttt-cell o';
+    cell.disabled = true;
+    const winner = checkWinner(board);
+    if(winner){ endGame(winner === 'draw' ? 'draw' : 'O'); }
+    else { statusText.textContent = "Your move — you're ×"; }
+  }
+
+  function onCellClick(e){
+    const i = Number(e.currentTarget.dataset.i);
+    if(over || board[i]) return;
+    board[i] = 'X';
+    e.currentTarget.textContent = '×';
+    e.currentTarget.className = 'ttt-cell x';
+    e.currentTarget.disabled = true;
+    const winner = checkWinner(board);
+    if(winner){ endGame(winner === 'draw' ? 'draw' : 'X'); return; }
+    statusText.textContent = "Stranger's thinking…";
+    setTimeout(strangerMove, 550);
+  }
+
+  resetBtn.addEventListener('click', newGame);
+  buildGrid();
+  newGame();
+</script>
+</body>
+</html>
