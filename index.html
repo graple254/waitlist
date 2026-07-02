@@ -16,6 +16,7 @@
     --cream:#FFF8EF;
     --ink:#241B2F;
     --coral:#FF6B57;
+    --coral-deep:#E14B3E;
     --mint:#2FC7AE;
     --sunny:#FFC64B;
     --lilac:#C9B6FF;
@@ -38,6 +39,105 @@
   }
 
   h1,.display-font{font-family:'Baloo 2',cursive;}
+
+  /* ---------- LAUNCH CURTAIN ---------- */
+  .curtain-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(36,27,47,.4);
+    z-index:999;
+    opacity:0;
+    animation:backdropFade .4s ease .3s forwards;
+  }
+  .curtain-backdrop.is-closed{
+    animation:backdropFadeOut .4s ease forwards;
+  }
+  .curtain{
+    position:fixed;
+    top:50%; left:50%;
+    width:min(560px,90vw);
+    transform:translate(-50%,-320%);
+    background:linear-gradient(180deg,var(--coral),var(--coral-deep));
+    color:#fff;
+    border-radius:26px;
+    padding:2rem 2.6rem 2.2rem;
+    box-shadow:0 30px 60px -18px rgba(36,27,47,.55);
+    z-index:1000;
+    text-align:center;
+    animation:curtainDrop .9s cubic-bezier(.34,1.56,.64,1) .5s forwards;
+  }
+  .curtain.is-closed{
+    animation:curtainRise .45s ease forwards;
+  }
+  .curtain::after{
+    content:'';
+    position:absolute;
+    left:0; right:0; bottom:-14px; height:18px;
+    background-image:radial-gradient(circle at 14px 0, transparent 14px, var(--coral-deep) 14.5px);
+    background-size:28px 18px;
+    background-repeat:repeat-x;
+  }
+  .curtain-tassels{
+    position:absolute;
+    left:0; right:0; bottom:-30px;
+    display:flex;
+    justify-content:space-evenly;
+    padding:0 30px;
+  }
+  .curtain-tassels span{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--sunny);
+    box-shadow:0 7px 0 -1px var(--mint);
+  }
+  .curtain-content{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:.5rem;
+  }
+  .curtain-icon{font-size:2.6rem;}
+  .curtain-text{display:flex; flex-direction:column; line-height:1.3;}
+  .curtain-text strong{
+    font-family:'Baloo 2',cursive;
+    font-size:clamp(1.3rem,3vw,1.7rem);
+    font-weight:700;
+  }
+  .curtain-text span{
+    font-size:1rem;
+    opacity:.94;
+    font-weight:500;
+    margin-top:.2rem;
+  }
+  .curtain-text span b{font-weight:800;}
+  .curtain-close{
+    position:absolute;
+    top:.7rem; right:.7rem;
+    background:rgba(255,255,255,.18);
+    border:none;
+    color:#fff;
+    width:30px;height:30px;
+    border-radius:50%;
+    font-size:1rem;
+    line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .curtain-close:hover{background:rgba(255,255,255,.32);}
+
+  @keyframes curtainDrop{
+    from{transform:translate(-50%,-320%);}
+    to{transform:translate(-50%,-50%);}
+  }
+  @keyframes curtainRise{
+    from{transform:translate(-50%,-50%); opacity:1;}
+    to{transform:translate(-50%,-320%); opacity:1;}
+  }
+  @keyframes backdropFade{ from{opacity:0;} to{opacity:1;} }
+  @keyframes backdropFadeOut{ from{opacity:1;} to{opacity:0;} }
+
+  @media (prefers-reduced-motion:reduce){
+    .curtain{animation:none; transform:translate(-50%,-50%);}
+    .curtain-backdrop{animation:none; opacity:1;}
+  }
 
   /* ---------- NAV ---------- */
   .navbar-chichi{
@@ -358,6 +458,19 @@
 </head>
 <body>
 
+<div class="curtain-backdrop" id="curtainBackdrop"></div>
+<div class="curtain" id="curtain">
+  <button class="curtain-close" id="curtainClose" aria-label="Dismiss">&times;</button>
+  <div class="curtain-content">
+    <span class="curtain-icon">🎭</span>
+    <div class="curtain-text">
+      <strong>Curtains Drop on Monday, July 6</strong>
+      <span id="curtainCountdown">counting down…</span>
+    </div>
+  </div>
+  <div class="curtain-tassels"><span></span><span></span><span></span><span></span><span></span></div>
+</div>
+
 <nav class="navbar-chichi d-flex justify-content-between align-items-center">
   <div class="logo">chichi<span class="dot">.</span><span class="beta-badge">beta</span></div>
   <button class="btn-notify-nav" onclick="document.getElementById('email').focus()">Reserve my spot</button>
@@ -428,6 +541,46 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  /* ---------- Launch curtain ---------- */
+  (function(){
+    const curtain = document.getElementById('curtain');
+    const backdrop = document.getElementById('curtainBackdrop');
+    const closeBtn = document.getElementById('curtainClose');
+    const countdownEl = document.getElementById('curtainCountdown');
+    const LAUNCH = new Date('2026-07-06T00:00:00');
+    let autoCloseTimer = setTimeout(closeCurtain, 10000);
+    let closed = false;
+
+    function tick(){
+      const diff = LAUNCH - new Date();
+      if(diff <= 0){
+        countdownEl.innerHTML = "We're <b>live</b> now 🎉";
+        return;
+      }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      countdownEl.innerHTML = `<b>${d}d ${h}h ${m}m</b> left`;
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    function closeCurtain(){
+      if(closed) return;
+      closed = true;
+      clearTimeout(autoCloseTimer);
+      curtain.classList.add('is-closed');
+      backdrop.classList.add('is-closed');
+      setTimeout(() => {
+        curtain.style.display = 'none';
+        backdrop.style.display = 'none';
+      }, 450);
+    }
+
+    closeBtn.addEventListener('click', closeCurtain);
+    backdrop.addEventListener('click', closeCurtain);
+  })();
+
   /* ---------- Formspree email capture ---------- */
   const form = document.getElementById('notifyForm');
   const btn = document.getElementById('notifyBtn');
@@ -435,11 +588,6 @@
 
   form.addEventListener('submit', async function(e){
     e.preventDefault();
-    if(form.action.includes('YOUR_FORM_ID')){
-      statusEl.textContent = "Almost there — plug your Formspree form ID into index.html.";
-      statusEl.className = 'form-status err';
-      return;
-    }
     const originalLabel = btn.textContent;
     btn.disabled = true;
     btn.textContent = "Sending…";
@@ -564,5 +712,9 @@
   buildGrid();
   newGame();
 </script>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2bc9e63644e445ee8a2cfc9e88d63f8e"}'></script>
+<!-- End Cloudflare Web Analytics -->
 </body>
 </html>
