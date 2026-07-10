@@ -3,718 +3,636 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>chichi — meet a stranger, then beat them at something</title>
-<meta name="description" content="Chichi is live video & text chat with real multiplayer games built in. Match with a stranger, then challenge them to tic tac toe, checkers, sudoku or 3 men's morris — live.">
+<title>Chichi — Closed Beta #1</title>
+<meta name="description" content="Chichi pairs you with a stranger and hands you a game to play, live. Closed Beta #1 — a short stress-test session, invite only for now.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a1a'/%3E%3Ctext x='50' y='68' text-anchor='middle' fill='white' font-size='48' font-family='system-ui, sans-serif' font-weight='600'%3Ech%3C/text%3E%3C/svg%3E">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
+    --ink:#191331;
+    --ink-soft:#241D3D;
+    --line-dark:rgba(255,248,239,.14);
     --cream:#FFF8EF;
-    --ink:#241B2F;
+    --paper:#FFFFFF;
     --coral:#FF6B57;
     --coral-deep:#E14B3E;
     --mint:#2FC7AE;
     --sunny:#FFC64B;
     --lilac:#C9B6FF;
-    --card:#FFFFFF;
-    --line:#EFE4D2;
+    --muted:#B9AFCB;
+    --text:#241B2F;
   }
 
   *{box-sizing:border-box;}
-  html,body{height:100%;}
+  html{scroll-behavior:smooth;}
   body{
     margin:0;
-    background:
-      radial-gradient(circle, #EFE1CC 1px, transparent 1.4px) 0 0/26px 26px,
-      var(--cream);
-    color:var(--ink);
+    background:var(--ink);
+    color:var(--cream);
     font-family:'Inter',sans-serif;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
+    -webkit-font-smoothing:antialiased;
   }
+  h1,h2,h3,.display-font{font-family:'Baloo 2',cursive;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
 
-  h1,.display-font{font-family:'Baloo 2',cursive;}
-
-  /* ---------- LAUNCH CURTAIN ---------- */
-  .curtain-backdrop{
-    position:fixed;
-    inset:0;
-    background:rgba(36,27,47,.4);
-    z-index:999;
-    opacity:0;
-    animation:backdropFade .4s ease .3s forwards;
-  }
-  .curtain-backdrop.is-closed{
-    animation:backdropFadeOut .4s ease forwards;
-  }
-  .curtain{
-    position:fixed;
-    top:50%; left:50%;
-    width:min(560px,90vw);
-    transform:translate(-50%,-320%);
-    background:linear-gradient(180deg,var(--coral),var(--coral-deep));
-    color:#fff;
-    border-radius:26px;
-    padding:2rem 2.6rem 2.2rem;
-    box-shadow:0 30px 60px -18px rgba(36,27,47,.55);
-    z-index:1000;
-    text-align:center;
-    animation:curtainDrop .9s cubic-bezier(.34,1.56,.64,1) .5s forwards;
-  }
-  .curtain.is-closed{
-    animation:curtainRise .45s ease forwards;
-  }
-  .curtain::after{
-    content:'';
-    position:absolute;
-    left:0; right:0; bottom:-14px; height:18px;
-    background-image:radial-gradient(circle at 14px 0, transparent 14px, var(--coral-deep) 14.5px);
-    background-size:28px 18px;
-    background-repeat:repeat-x;
-  }
-  .curtain-tassels{
-    position:absolute;
-    left:0; right:0; bottom:-30px;
-    display:flex;
-    justify-content:space-evenly;
-    padding:0 30px;
-  }
-  .curtain-tassels span{
-    width:9px;height:9px;border-radius:50%;
-    background:var(--sunny);
-    box-shadow:0 7px 0 -1px var(--mint);
-  }
-  .curtain-content{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:.5rem;
-  }
-  .curtain-icon{font-size:2.6rem;}
-  .curtain-text{display:flex; flex-direction:column; line-height:1.3;}
-  .curtain-text strong{
-    font-family:'Baloo 2',cursive;
-    font-size:clamp(1.3rem,3vw,1.7rem);
+  .section{padding:5.5rem clamp(1.25rem,5vw,4rem);}
+  .section-tight{padding-top:3.5rem; padding-bottom:3.5rem;}
+  .section-title{
+    font-size:clamp(1.6rem,3vw,2.2rem);
     font-weight:700;
+    margin-bottom:.4rem;
+    color:var(--ink);
   }
-  .curtain-text span{
-    font-size:1rem;
-    opacity:.94;
-    font-weight:500;
-    margin-top:.2rem;
+  .section-sub{
+    color:#6B6074;
+    font-size:.98rem;
+    max-width:34rem;
+    margin-bottom:2.4rem;
   }
-  .curtain-text span b{font-weight:800;}
-  .curtain-close{
-    position:absolute;
-    top:.7rem; right:.7rem;
-    background:rgba(255,255,255,.18);
-    border:none;
-    color:#fff;
-    width:30px;height:30px;
-    border-radius:50%;
-    font-size:1rem;
-    line-height:1;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .curtain-close:hover{background:rgba(255,255,255,.32);}
+  .light-section{background:var(--cream); color:var(--text);}
 
-  @keyframes curtainDrop{
-    from{transform:translate(-50%,-320%);}
-    to{transform:translate(-50%,-50%);}
+  /* ---------- grid-board texture ---------- */
+  .board-texture{
+    position:relative;
   }
-  @keyframes curtainRise{
-    from{transform:translate(-50%,-50%); opacity:1;}
-    to{transform:translate(-50%,-320%); opacity:1;}
-  }
-  @keyframes backdropFade{ from{opacity:0;} to{opacity:1;} }
-  @keyframes backdropFadeOut{ from{opacity:1;} to{opacity:0;} }
-
-  @media (prefers-reduced-motion:reduce){
-    .curtain{animation:none; transform:translate(-50%,-50%);}
-    .curtain-backdrop{animation:none; opacity:1;}
+  .board-texture::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line-dark) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 20%, #000 40%, transparent 85%);
+    mask-image:radial-gradient(ellipse 90% 70% at 50% 20%, #000 40%, transparent 85%);
+    pointer-events:none;
   }
 
   /* ---------- NAV ---------- */
-  .navbar-chichi{
-    padding:1rem clamp(1.25rem,4vw,3.5rem) 0;
-    flex-shrink:0;
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1.1rem clamp(1.25rem,5vw,4rem);
+    background:rgba(25,19,49,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line-dark);
   }
   .logo{
     font-family:'Baloo 2',cursive;
     font-weight:800;
-    font-size:1.45rem;
-    color:var(--ink);
-  }
-  .logo span.dot{color:var(--coral);}
-  .beta-badge{
-    font-family:'Inter',sans-serif;
-    font-size:.62rem;
-    font-weight:700;
-    letter-spacing:.06em;
-    background:var(--lilac);
-    color:var(--ink);
-    padding:.15rem .5rem;
-    border-radius:999px;
-    vertical-align:middle;
-    margin-left:.4rem;
-  }
-  .btn-notify-nav{
-    background:var(--ink);
+    font-size:1.35rem;
     color:var(--cream);
-    border:none;
-    border-radius:999px;
-    padding:.5rem 1.15rem;
-    font-weight:600;
-    font-size:.82rem;
+    letter-spacing:-.01em;
   }
-  .btn-notify-nav:hover{background:var(--coral); color:var(--ink);}
+  .logo span{color:var(--coral);}
+  .nav-links{display:flex; gap:2rem; list-style:none; margin:0; padding:0;}
+  .nav-links a{
+    font-size:.86rem; font-weight:600; color:var(--muted);
+    text-decoration:none; transition:color .15s ease;
+  }
+  .nav-links a:hover{color:var(--cream);}
+  .nav-badge{
+    font-size:.6rem; font-weight:700; letter-spacing:.08em;
+    background:var(--coral); color:var(--ink);
+    padding:.2rem .5rem; border-radius:5px; margin-left:.5rem;
+    vertical-align:middle;
+  }
 
-  /* ---------- HERO ---------- */
-  .hero-wrap{
-    flex:1 1 auto;
-    display:flex;
-    align-items:center;
-    padding:clamp(.75rem,2vh,1.5rem) clamp(1.25rem,4vw,3.5rem);
+  /* ---------- HERO / TICKET ---------- */
+  .hero{
+    padding-top:4.5rem; padding-bottom:4rem;
+    position:relative; overflow:hidden;
   }
+  .ticket{
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns:1.15fr 1px .95fr;
+    align-items:stretch;
+    background:var(--ink-soft);
+    border:1px solid var(--line-dark);
+    border-radius:22px;
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.55);
+    position:relative;
+    isolation:isolate;
+  }
+  .ticket-perf{
+    position:relative;
+    background:repeating-linear-gradient(to bottom, var(--line-dark) 0 10px, transparent 10px 20px);
+  }
+  .ticket-perf::before,.ticket-perf::after{
+    content:'';
+    position:absolute; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:var(--ink);
+  }
+  .ticket-perf::before{top:-13px;}
+  .ticket-perf::after{bottom:-13px;}
+
+  .ticket-main{padding:2.6rem clamp(1.5rem,3vw,3rem);}
+  .ticket-side{padding:2.6rem clamp(1.5rem,3vw,2.4rem); display:flex; flex-direction:column; justify-content:center;}
 
   .eyebrow{
-    display:inline-flex;
-    align-items:center;
-    gap:.4rem;
-    background:#fff;
-    border:1px solid var(--line);
+    display:inline-flex; align-items:center; gap:.45rem;
+    background:rgba(255,107,87,.14);
+    border:1px solid rgba(255,107,87,.35);
     color:var(--coral);
-    font-weight:600;
-    font-size:.76rem;
-    padding:.32rem .75rem;
-    border-radius:999px;
-    margin-bottom:.85rem;
+    font-weight:700; font-size:.74rem; letter-spacing:.06em;
+    padding:.35rem .8rem; border-radius:999px;
+    margin-bottom:1.1rem;
   }
 
   h1.headline{
-    font-size:clamp(1.7rem,3.2vw,2.85rem);
-    font-weight:800;
-    line-height:1.1;
-    margin-bottom:.7rem;
+    font-size:clamp(2rem,4vw,3.1rem);
+    font-weight:800; line-height:1.08;
+    margin:0 0 1rem;
+    color:var(--cream);
   }
-  h1.headline .hl{
-    color:var(--coral);
-    position:relative;
-    white-space:nowrap;
-  }
-  h1.headline .hl svg{
-    position:absolute;
-    left:0; bottom:-.14em;
-    width:100%; height:.3em;
+  h1.headline em{
+    font-style:normal; color:var(--mint);
   }
 
   .lead-copy{
-    font-size:clamp(.9rem,1.05vw,1.02rem);
-    color:#5B5064;
+    font-size:1rem; line-height:1.6;
+    color:var(--muted);
     max-width:32rem;
+    margin-bottom:1.7rem;
+  }
+
+  .event-card{
+    display:flex; flex-wrap:wrap; gap:.6rem;
+    margin-bottom:1.6rem;
+  }
+  .et-pill{
+    display:inline-flex; align-items:center; gap:.4rem;
+    background:rgba(255,248,239,.06);
+    border:1px solid var(--line-dark);
+    border-radius:999px;
+    padding:.45rem .9rem;
+    font-size:.82rem; font-weight:600;
+    color:var(--cream);
+  }
+
+  .btn-cta{
+    display:inline-flex; align-items:center; gap:.55rem;
+    background:var(--coral); color:var(--ink);
+    border:none; border-radius:12px;
+    padding:.95rem 1.7rem;
+    font-weight:700; font-size:1rem;
+    text-decoration:none;
+    transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+    box-shadow:0 12px 28px -10px rgba(255,107,87,.55);
+  }
+  .btn-cta:hover:not(.is-disabled){transform:translateY(-2px); background:#ff5540;}
+  .btn-cta.is-disabled{
+    background:rgba(255,248,239,.1);
+    color:var(--muted);
+    box-shadow:none;
+    cursor:not-allowed;
+    pointer-events:none;
+  }
+  .cta-note{
+    font-size:.78rem; color:var(--muted); margin-top:.65rem;
+  }
+  .cta-note.is-live{color:var(--mint); font-weight:600;}
+
+  /* ---------- countdown stub ---------- */
+  .stub-label{
+    font-size:.7rem; font-weight:700; letter-spacing:.1em;
+    color:var(--muted); text-transform:uppercase;
     margin-bottom:1.1rem;
   }
-  .lead-copy strong{color:var(--ink);}
+  .countdown{
+    display:flex; gap:.6rem; margin-bottom:1.1rem;
+  }
+  .cd-unit{
+    flex:1; text-align:center;
+    background:rgba(0,0,0,.22);
+    border:1px solid var(--line-dark);
+    border-radius:12px;
+    padding:.75rem .25rem .6rem;
+  }
+  .cd-unit .cd-num{
+    font-size:clamp(1.5rem,3vw,2.1rem);
+    font-weight:700; color:var(--cream);
+    line-height:1; letter-spacing:-.02em;
+  }
+  .cd-unit .cd-lbl{
+    font-size:.6rem; font-weight:600; letter-spacing:.08em;
+    color:var(--muted); text-transform:uppercase; margin-top:.35rem;
+  }
+  .stub-foot{
+    font-size:.76rem; color:var(--muted); border-top:1px dashed var(--line-dark);
+    padding-top:.9rem; line-height:1.7;
+  }
+  .stub-foot b{color:var(--cream); font-weight:600;}
+  .stub-tag{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:1.2rem; font-size:.68rem; color:var(--muted);
+    letter-spacing:.05em; text-transform:uppercase;
+  }
 
-  .chip-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:.4rem;
-    margin-bottom:1.2rem;
+  /* ---------- INFO CARDS ---------- */
+  .info-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem;
+    max-width:1180px; margin:0 auto;
   }
-  .chip{
-    display:inline-flex;
-    align-items:center;
-    gap:.35rem;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:.32rem .7rem;
-    font-size:.75rem;
-    font-weight:600;
-    color:var(--ink);
+  .info-card{
+    background:var(--paper);
+    border:1px solid #EFE4D2;
+    border-radius:18px;
+    padding:1.8rem 1.7rem;
   }
-  .chip i{font-size:.82rem; color:var(--mint);}
-  .chip.game i{color:var(--coral);}
-
-  .email-form{
-    display:flex;
-    gap:.5rem;
-    max-width:25rem;
+  .info-card .ic-icon{
+    width:42px; height:42px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.25rem; margin-bottom:1.1rem;
   }
-  .email-form input{
-    border-radius:999px;
-    border:1.5px solid var(--line);
-    padding:.6rem 1.05rem;
-    font-size:.88rem;
-    flex:1;
+  .info-card:nth-child(1) .ic-icon{background:#FFEADB; color:var(--coral-deep);}
+  .info-card:nth-child(2) .ic-icon{background:#E4F7F3; color:var(--mint);}
+  .info-card:nth-child(3) .ic-icon{background:#F1EBFF; color:#7A5CD6;}
+  .info-card h3{font-size:1.12rem; font-weight:700; margin:0 0 .85rem; color:var(--text);}
+  .info-card ul{margin:0; padding:0; list-style:none;}
+  .info-card li{
+    font-size:.9rem; color:#544A5C; padding:.4rem 0 .4rem 1.35rem; position:relative;
+    line-height:1.5; border-top:1px solid #F3ECDD;
   }
-  .email-form input:focus{
-    box-shadow:0 0 0 3px rgba(255,107,87,.18);
-    border-color:var(--coral);
-    outline:none;
-  }
-  .btn-cta{
+  .info-card li:first-child{border-top:none;}
+  .info-card li::before{
+    content:'';
+    position:absolute; left:0; top:.95rem;
+    width:6px; height:6px; border-radius:50%;
     background:var(--coral);
-    color:#fff;
-    border:none;
-    border-radius:999px;
-    padding:.6rem 1.3rem;
-    font-weight:700;
-    font-size:.88rem;
-    white-space:nowrap;
-    transition:transform .15s ease, background .15s ease;
   }
-  .btn-cta:hover{background:#ff5540; transform:translateY(-1px);}
-  .btn-cta:disabled{opacity:.7; transform:none;}
-
-  .form-note{
-    font-size:.74rem;
-    color:#9A8FA3;
-    margin-top:.55rem;
-  }
-  .form-note a{color:var(--mint); text-decoration:none; font-weight:600;}
-  .form-note a:hover{text-decoration:underline;}
-
-  .form-status{
-    font-size:.8rem;
-    font-weight:600;
-    margin-top:.5rem;
-    min-height:1.1em;
-  }
-  .form-status.ok{color:var(--mint);}
-  .form-status.err{color:var(--coral);}
-
-  /* ---------- SIGNATURE: LIVE PLAYABLE DEMO ---------- */
-  .demo-col{
-    display:flex;
-    justify-content:center;
-  }
-  .call-card{
-    width:min(370px,100%);
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:24px;
-    box-shadow:0 26px 55px -22px rgba(36,27,47,.3);
-    transform:rotate(-1.3deg);
-    padding:1rem 1.1rem 1.1rem;
-  }
-  .browser-topbar{
-    display:flex;
-    gap:.32rem;
-    margin-bottom:.75rem;
-  }
-  .browser-topbar span{width:8px;height:8px;border-radius:50%;background:var(--line);}
-  .browser-topbar span:nth-child(1){background:var(--coral);}
-  .browser-topbar span:nth-child(2){background:var(--sunny);}
-  .browser-topbar span:nth-child(3){background:var(--mint);}
-
-  .participants{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:.6rem;
-    margin-bottom:.4rem;
-  }
-  .avatar{
-    width:44px;height:44px;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.25rem;
-    position:relative;
-    flex-shrink:0;
-  }
-  .avatar.you{background:#FFEADB; color:var(--coral);}
-  .avatar.stranger{background:#E4F7F3; color:var(--mint);}
-  .avatar .dot{
-    position:absolute; top:0; right:0;
-    width:9px;height:9px;border-radius:50%;
-    background:#3ecf6a; border:2px solid #fff;
-  }
-  .link-line{
-    flex:1;
-    max-width:60px;
-    height:0;
-    border-top:2px dashed var(--line);
+  .info-card.steps li{counter-increment:step; padding-left:1.9rem;}
+  .info-card.steps{counter-reset:step;}
+  .info-card.steps li::before{
+    content:counter(step);
+    width:18px; height:18px; border-radius:50%;
+    background:var(--ink); color:var(--cream);
+    font-size:.66rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    top:.62rem;
   }
 
-  .matched-tag{
-    text-align:center;
-    font-size:.72rem;
-    font-weight:700;
-    color:#8A7F92;
-    margin-bottom:.7rem;
+  /* ---------- SCREENSHOTS ---------- */
+  .shot-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem;
+    max-width:1180px; margin:0 auto;
   }
+  .shot-card{
+    background:var(--paper); border:1px solid #EFE4D2; border-radius:18px;
+    padding:.9rem; transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .shot-card:hover{transform:translateY(-6px); box-shadow:0 24px 44px -20px rgba(36,27,47,.28);}
+  .shot-topbar{display:flex; gap:.32rem; margin-bottom:.7rem; padding:0 .2rem;}
+  .shot-topbar span{width:8px; height:8px; border-radius:50%; background:#EFE4D2;}
+  .shot-topbar span:nth-child(1){background:var(--coral);}
+  .shot-topbar span:nth-child(2){background:var(--sunny);}
+  .shot-topbar span:nth-child(3){background:var(--mint);}
+  .shot-screen{
+    background:var(--cream); border-radius:12px; padding:1.1rem;
+    min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.6rem;
+  }
+  .shot-caption{font-size:.82rem; color:#6B6074; margin:.9rem .2rem 0; line-height:1.5;}
+  .shot-avatars{display:flex; align-items:center; gap:.5rem;}
+  .shot-avatars .a{
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem;
+  }
+  .shot-avatars .a.you{background:#FFEADB; color:var(--coral);}
+  .shot-avatars .a.stranger{background:#E4F7F3; color:var(--mint);}
+  .shot-dash{flex:1; max-width:34px; height:0; border-top:2px dashed #E3D8C4;}
+  .mini-board{display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:96px;}
+  .mini-board div{
+    aspect-ratio:1/1; background:#fff; border:1px solid #EFE4D2; border-radius:5px;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem; font-family:'Baloo 2',cursive;
+  }
+  .mini-board div.x{color:var(--coral);}
+  .mini-board div.o{color:var(--mint);}
+  .checker-row{display:flex; gap:6px;}
+  .checker-row .pc{width:18px; height:18px; border-radius:50%;}
+  .checker-row .pc.red{background:var(--coral);}
+  .checker-row .pc.cream{background:#fff; border:2px solid var(--ink);}
+  .waiting-pulse{
+    width:52px; height:52px; border-radius:50%;
+    border:3px solid #EFE4D2; border-top-color:var(--coral);
+    animation:spin 1.1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
 
-  .game-panel{
-    background:var(--cream);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:.85rem;
+  /* ---------- GAMES ---------- */
+  .games-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem;
+    max-width:1180px; margin:0 auto;
   }
-  .game-panel-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:.55rem;
+  .game-card{
+    background:var(--ink-soft); border:1px solid var(--line-dark); border-radius:16px;
+    padding:1.5rem 1.3rem; transition:transform .18s ease, border-color .18s ease;
   }
-  .game-panel-head .label{
-    font-size:.68rem;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.05em;
-    color:var(--coral);
-    display:flex;
-    align-items:center;
-    gap:.3rem;
+  .game-card:hover{transform:translateY(-4px); border-color:rgba(255,255,255,.3);}
+  .game-card .gc-icon{
+    width:44px; height:44px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+    margin-bottom:1rem;
   }
-  .score{
-    font-size:.72rem;
-    font-weight:700;
-    color:var(--ink);
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:.15rem .55rem;
-  }
-  .score b{color:var(--coral);}
-  .score b.o{color:var(--mint);}
+  .game-card:nth-child(1) .gc-icon{background:rgba(255,107,87,.16); color:var(--coral);}
+  .game-card:nth-child(2) .gc-icon{background:rgba(47,199,174,.16); color:var(--mint);}
+  .game-card:nth-child(3) .gc-icon{background:rgba(255,198,75,.16); color:var(--sunny);}
+  .game-card:nth-child(4) .gc-icon{background:rgba(201,182,255,.18); color:var(--lilac);}
+  .game-card h3{font-size:1.05rem; font-weight:700; margin:0 0 .4rem; color:var(--cream);}
+  .game-card p{font-size:.86rem; color:var(--muted); margin:0; line-height:1.5;}
 
-  .ttt-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:6px;
-    margin-bottom:.55rem;
-  }
-  .ttt-cell{
-    aspect-ratio:1/1;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:9px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Baloo 2',cursive;
-    font-weight:700;
-    font-size:1.35rem;
-    cursor:pointer;
-    color:var(--ink);
-    transition:background .12s ease, transform .1s ease;
-    padding:0;
-  }
-  .ttt-cell:hover:not(:disabled){background:#FFF1E6; transform:scale(1.03);}
-  .ttt-cell:disabled{cursor:default;}
-  .ttt-cell.x{color:var(--coral);}
-  .ttt-cell.o{color:var(--mint);}
-
-  .game-status{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:.5rem;
-  }
-  .game-status span{
-    font-size:.76rem;
-    color:#7A6E82;
-    font-weight:500;
-  }
-  .btn-reset{
-    background:none;
-    border:1px solid var(--line);
-    border-radius:999px;
-    width:26px;height:26px;
-    display:flex;align-items:center;justify-content:center;
-    color:var(--ink);
-    font-size:.8rem;
-    flex-shrink:0;
-  }
-  .btn-reset:hover{background:#fff; border-color:var(--coral); color:var(--coral);}
-
-  .try-hint{
-    text-align:center;
-    font-size:.72rem;
-    color:#9A8FA3;
-    margin-top:.65rem;
-  }
+  /* ---------- FAQ ---------- */
+  .faq-wrap{max-width:760px; margin:0 auto;}
+  .faq-item{border-top:1px solid #EFE4D2; padding:1.3rem 0;}
+  .faq-item:last-child{border-bottom:1px solid #EFE4D2;}
+  .faq-q{font-weight:700; font-size:1rem; color:var(--text); margin-bottom:.45rem;}
+  .faq-a{font-size:.92rem; color:#6B6074; line-height:1.6; margin:0;}
 
   /* ---------- FOOTER ---------- */
   footer.chichi-footer{
-    flex-shrink:0;
-    text-align:center;
-    font-size:.74rem;
-    color:#A99EAF;
-    padding:.5rem 1rem 1rem;
+    text-align:center; padding:2.2rem 1rem 2.4rem;
+    border-top:1px solid var(--line-dark);
   }
+  footer.chichi-footer .f-logo{font-family:'Baloo 2',cursive; font-weight:800; font-size:1.1rem; margin-bottom:.3rem;}
+  footer.chichi-footer .f-logo span{color:var(--coral);}
+  footer.chichi-footer a{color:var(--muted); text-decoration:none; font-size:.85rem;}
+  footer.chichi-footer a:hover{color:var(--cream);}
 
-  @media (max-width:991px){
-    .demo-col{margin-top:1.5rem;}
+  @media (max-width:940px){
+    .ticket{grid-template-columns:1fr;}
+    .ticket-perf{
+      background:repeating-linear-gradient(to right, var(--line-dark) 0 10px, transparent 10px 20px);
+      height:1px; width:100%;
+    }
+    .ticket-perf::before,.ticket-perf::after{top:50%; transform:translateY(-50%);}
+    .ticket-perf::before{left:-13px;}
+    .ticket-perf::after{left:auto; right:-13px;}
+    .info-grid,.shot-grid{grid-template-columns:1fr;}
+    .games-grid{grid-template-columns:repeat(2,1fr);}
+    .nav-links{display:none;}
+  }
+  @media (max-width:560px){
+    .games-grid{grid-template-columns:1fr;}
+    .countdown{flex-wrap:wrap;}
+    .cd-unit{min-width:calc(50% - .3rem);}
   }
 </style>
 </head>
 <body>
 
-<div class="curtain-backdrop" id="curtainBackdrop"></div>
-<div class="curtain" id="curtain">
-  <button class="curtain-close" id="curtainClose" aria-label="Dismiss">&times;</button>
-  <div class="curtain-content">
-    <span class="curtain-icon">🎭</span>
-    <div class="curtain-text">
-      <strong>Curtains Drop on Monday, July 17</strong>
-      <span id="curtainCountdown">counting down…</span>
-    </div>
-  </div>
-  <div class="curtain-tassels"><span></span><span></span><span></span><span></span><span></span></div>
-</div>
-
-<nav class="navbar-chichi d-flex justify-content-between align-items-center">
-  <div class="logo">chichi<span class="dot">.</span><span class="beta-badge">beta</span></div>
-  <button class="btn-notify-nav" onclick="document.getElementById('email').focus()">Reserve my spot</button>
+<nav class="nav">
+  <div class="logo">chichi<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#beta">Beta<span class="nav-badge">#1</span></a></li>
+    <li><a href="#games">Games</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
 </nav>
 
-<div class="hero-wrap">
-  <div class="row align-items-center g-4 w-100">
+<section class="hero board-texture" id="beta">
+  <div class="ticket">
+    <div class="ticket-main">
+      <span class="eyebrow">🎮 CLOSED BETA #1</span>
+      <h1 class="headline">Meet someone new.<br>Play instead of <em>small talk</em>.</h1>
+      <p class="lead-copy">Chichi pairs you with a stranger over live video, then immediately hands you both a board to play Tic Tac Toe, Checkers, Three Men's Morris, or Sudoku. No opener needed. The game gives you something to talk about while you figure each other out.</p>
 
-    <div class="col-lg-6">
-      <div class="eyebrow"><i class="bi bi-controller"></i> The most fun way to meet new people online</div>
-
-      <h1 class="headline">Afraid of meeting new people.<br>Then <span class="hl">break the ice with</span> board games.
-      </h1>
-
-      <p class="lead-copy">Chichi is live video &amp; text chat with real multiplayer games baked in. <strong> Whether it's Checkers, Tic Tac Toe, Sudoku or more,</strong> games make conversations natural.</p>
-
-      <div class="chip-row">
-        <span class="chip"><i class="bi bi-camera-video-fill"></i> Video chat</span>
-        <span class="chip"><i class="bi bi-chat-dots-fill"></i> Text chat</span>
-        <span class="chip game"><i class="bi bi-grid-3x3"></i> Tic Tac Toe</span>
-        <span class="chip game"><i class="bi bi-dice-5-fill"></i> Checkers</span>
-        <span class="chip game"><i class="bi bi-triangle"></i> 3 Men's Morris</span>
-        <span class="chip game"><i class="bi bi-grid-3x3-gap-fill"></i> Sudoku</span>
+      <div class="event-card">
+        <span class="et-pill">⏱ Open for 4 hours</span>
+        <span class="et-pill">👥 Invite only, limited spots</span>
       </div>
 
-      <form id="notifyForm" class="email-form" action="https://formspree.io/f/xbdvzpny" method="POST" novalidate>
-        <input type="email" name="email" id="email" required placeholder="you@example.com" aria-label="Email address">
-        <button type="submit" class="btn-cta" id="notifyBtn">Reserve my spot</button>
-      </form>
-      <div class="form-status" id="formStatus" role="status"></div>
-      <div class="form-note"><i class="bi bi-shield-check"></i> No spam, Exclusive invitations to beta play sessions and Early access before public launch. Email us directly at <a href="mailto:info@chichi.quest">info@chichi.quest</a></div>
+      <a href="https://beta.chichi.quest" class="btn-cta is-disabled" id="ctaBtn" target="_blank" rel="noopener">
+        <span id="ctaLabel">Join Closed Beta</span>
+      </a>
+      <div class="cta-note" id="ctaNote">Available when the countdown reaches zero.</div>
     </div>
 
-    <div class="col-lg-6">
-      <div class="demo-col">
-        <div class="call-card">
-          <div class="browser-topbar"><span></span><span></span><span></span></div>
+    <div class="ticket-perf"></div>
 
-          <div class="participants">
-            <div class="avatar you"><i class="bi bi-emoji-sunglasses"></i><span class="dot"></span></div>
-            <div class="link-line"></div>
-            <div class="avatar stranger"><i class="bi bi-emoji-wink"></i><span class="dot"></span></div>
-          </div>
-          <div class="matched-tag">🎉 matched — say hi, then make a move</div>
+    <div class="ticket-side">
+      <div class="stub-label">Starts in</div>
+      <div class="countdown" id="countdown">
+        <div class="cd-unit"><div class="cd-num mono" id="cd-days">--</div><div class="cd-lbl">Days</div></div>
+        <div class="cd-unit"><div class="cd-num mono" id="cd-hours">--</div><div class="cd-lbl">Hours</div></div>
+        <div class="cd-unit"><div class="cd-num mono" id="cd-mins">--</div><div class="cd-lbl">Min</div></div>
+        <div class="cd-unit"><div class="cd-num mono" id="cd-secs">--</div><div class="cd-lbl">Sec</div></div>
+      </div>
+      <div class="stub-foot">
+        Starts <b class="mono" id="localStart">…</b> your time<br>
+        UTC: <span class="mono">2026-07-11T21:00:00Z</span>
+      </div>
+      <div class="stub-tag">
+        <span>Admit one</span>
+        <span>Session #1</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-          <div class="game-panel">
-            <div class="game-panel-head">
-              <span class="label"><i class="bi bi-joystick"></i> Tic Tac Toe</span>
-              <span class="score">You <b id="scoreYou">0</b> · <b class="o" id="scoreStranger">0</b> Stranger</span>
-            </div>
+<section class="section light-section" id="about">
+  <div class="section-title" style="text-align:center; max-width:640px; margin:0 auto .4rem;">What the beta is</div>
+  <p class="section-sub" style="text-align:center; margin:0 auto 2.6rem;">Three things to know before Saturday.</p>
 
-            <div class="ttt-grid" id="tttGrid"></div>
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="ic-icon">🎥</div>
+      <h3>What to Expect</h3>
+      <ul>
+        <li>Random video chat with another tester</li>
+        <li>A multiplayer board game, live, in the same window</li>
+        <li>Real conversation — the game breaks the ice</li>
+        <li>A short feedback prompt at the end</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">👋</div>
+      <h3>Who We're Looking For</h3>
+      <ul>
+        <li>People who like meeting new people online</li>
+        <li>People who like games — casual or competitive</li>
+        <li>People who want a hand in shaping a new product</li>
+        <li>No technical experience required</li>
+      </ul>
+    </div>
+    <div class="info-card steps">
+      <div class="ic-icon">🕹️</div>
+      <h3>How the Beta Works</h3>
+      <ul>
+        <li>Wait for the countdown</li>
+        <li>Click Join Beta</li>
+        <li>Meet another tester</li>
+        <li>Play a game together</li>
+        <li>Tell us what you think</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-            <div class="game-status">
-              <span id="gameStatus">Your move — you're ×</span>
-              <button type="button" class="btn-reset" id="resetGame" title="New game" aria-label="New game"><i class="bi bi-arrow-clockwise"></i></button>
-            </div>
-          </div>
-          <div class="try-hint">go ahead, actually click a square 👆</div>
+<section class="section light-section" id="screens" style="padding-top:1rem;">
+  <div class="section-title" style="text-align:center; max-width:640px; margin:0 auto .4rem;">Inside a session</div>
+  <p class="section-sub" style="text-align:center; margin:0 auto 2.6rem;">A quick look at what testers will actually see.</p>
+
+  <div class="shot-grid">
+    <div class="shot-card">
+      <div class="shot-topbar"><span></span><span></span><span></span></div>
+      <div class="shot-screen">
+        <div class="waiting-pulse"></div>
+      </div>
+      <p class="shot-caption"><b>Finding a match</b> — matchmaking connects you to another tester in seconds.</p>
+    </div>
+    <div class="shot-card">
+      <div class="shot-topbar"><span></span><span></span><span></span></div>
+      <div class="shot-screen">
+        <div class="shot-avatars">
+          <div class="a you">🙂</div>
+          <div class="shot-dash"></div>
+          <div class="a stranger">😉</div>
+        </div>
+        <div class="mini-board">
+          <div class="x">×</div><div></div><div class="o">○</div>
+          <div></div><div class="x">×</div><div></div>
+          <div class="o">○</div><div></div><div></div>
         </div>
       </div>
+      <p class="shot-caption"><b>Matched and playing</b> — video stays on while the board sits right below it.</p>
     </div>
-
+    <div class="shot-card">
+      <div class="shot-topbar"><span></span><span></span><span></span></div>
+      <div class="shot-screen">
+        <div class="checker-row">
+          <div class="pc red"></div><div class="pc cream"></div><div class="pc red"></div><div class="pc cream"></div>
+        </div>
+        <div class="checker-row">
+          <div class="pc cream"></div><div class="pc red"></div><div class="pc cream"></div><div class="pc red"></div>
+        </div>
+      </div>
+      <p class="shot-caption"><b>More than one game</b> — switch boards mid-chat if you want a change of pace.</p>
+    </div>
   </div>
-</div>
+</section>
 
-<footer class="chichi-footer">Built solo, one board at a time · launching soon</footer>
+<section class="section board-texture" id="games">
+  <div class="section-title" style="color:var(--cream); text-align:center; max-width:640px; margin:0 auto .4rem;">The games</div>
+  <p class="section-sub" style="text-align:center; margin:0 auto 2.6rem;">Four boards, live at launch. More coming as the beta grows.</p>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="games-grid">
+    <div class="game-card">
+      <div class="gc-icon">⭕</div>
+      <h3>Tic Tac Toe</h3>
+      <p>Simple. Competitive. Perfect icebreaker.</p>
+    </div>
+    <div class="game-card">
+      <div class="gc-icon">🔴</div>
+      <h3>Checkers</h3>
+      <p>A real match, no board required at home.</p>
+    </div>
+    <div class="game-card">
+      <div class="gc-icon">🔺</div>
+      <h3>Three Men's Morris</h3>
+      <p>A quick classic most people forgot they knew.</p>
+    </div>
+    <div class="game-card">
+      <div class="gc-icon">🔢</div>
+      <h3>Sudoku</h3>
+      <p>Solve it together, or race to finish first.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section light-section" id="faq">
+  <div class="section-title" style="text-align:center; max-width:640px; margin:0 auto .4rem;">FAQ</div>
+  <p class="section-sub" style="text-align:center; margin:0 auto 2.6rem;">The short version.</p>
+
+  <div class="faq-wrap">
+    <div class="faq-item">
+      <div class="faq-q">Is Chichi free?</div>
+      <p class="faq-a">Yes. The Closed Beta is completely free.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why are you running a beta?</div>
+      <p class="faq-a">We want to improve Chichi with real feedback before public launch.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What happens after the beta?</div>
+      <p class="faq-a">We'll review feedback, improve the platform, and invite more users in future beta sessions.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="chichi-footer">
+  <div class="f-logo">chichi<span>.</span></div>
+  <a href="mailto:info@chichi.quest">info@chichi.quest</a>
+</footer>
+
 <script>
-  /* ---------- Launch curtain ---------- */
-  (function(){
-    const curtain = document.getElementById('curtain');
-    const backdrop = document.getElementById('curtainBackdrop');
-    const closeBtn = document.getElementById('curtainClose');
-    const countdownEl = document.getElementById('curtainCountdown');
-    const LAUNCH = new Date('2026-07-13T00:00:00');
-    let autoCloseTimer = setTimeout(closeCurtain, 10000);
-    let closed = false;
+  /* ============================================================
+     Countdown target — change this single line to update the event.
+     Must be an ISO 8601 string with a timezone (Z = UTC) so every
+     visitor's browser converts it to their own local time automatically.
+     ============================================================ */
+  const EVENT_START = new Date('2026-07-11T21:00:00Z');
 
-    function tick(){
-      const diff = LAUNCH - new Date();
-      if(diff <= 0){
-        countdownEl.innerHTML = "We're <b>live</b> now 🎉";
-        return;
-      }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      countdownEl.innerHTML = `<b>${d}d ${h}h ${m}m</b> left`;
-    }
-    tick();
-    setInterval(tick, 30000);
-
-    function closeCurtain(){
-      if(closed) return;
-      closed = true;
-      clearTimeout(autoCloseTimer);
-      curtain.classList.add('is-closed');
-      backdrop.classList.add('is-closed');
-      setTimeout(() => {
-        curtain.style.display = 'none';
-        backdrop.style.display = 'none';
-      }, 450);
-    }
-
-    closeBtn.addEventListener('click', closeCurtain);
-    backdrop.addEventListener('click', closeCurtain);
-  })();
-
-  /* ---------- Formspree email capture ---------- */
-  const form = document.getElementById('notifyForm');
-  const btn = document.getElementById('notifyBtn');
-  const statusEl = document.getElementById('formStatus');
-
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    const originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = "Sending…";
-    statusEl.textContent = '';
-    statusEl.className = 'form-status';
-
-    try{
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
-      });
-      if(res.ok){
-        statusEl.textContent = "You're on the list 🎉 — see you at launch.";
-        statusEl.className = 'form-status ok';
-        form.reset();
-      } else {
-        statusEl.textContent = "Hmm, that didn't go through — try again?";
-        statusEl.className = 'form-status err';
-      }
-    } catch(err){
-      statusEl.textContent = "Network hiccup — try again in a moment.";
-      statusEl.className = 'form-status err';
-    }
-    btn.disabled = false;
-    btn.textContent = originalLabel;
-  });
-
-  /* ---------- Playable tic-tac-toe demo ---------- */
-  const gridEl = document.getElementById('tttGrid');
-  const statusText = document.getElementById('gameStatus');
-  const scoreYouEl = document.getElementById('scoreYou');
-  const scoreStrangerEl = document.getElementById('scoreStranger');
-  const resetBtn = document.getElementById('resetGame');
-
-  let board, over, scoreYou = 0, scoreStranger = 0;
-  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  const STRANGER_LINES = {
-    win: ["stranger: gg 😏","stranger: rematch??","stranger: too easy 😎"],
-    lose: ["stranger: wait what 😳","stranger: ok you're good","stranger: rematch!"],
-    draw: ["stranger: well played","stranger: draw huh","stranger: again?"]
+  const els = {
+    days: document.getElementById('cd-days'),
+    hours: document.getElementById('cd-hours'),
+    mins: document.getElementById('cd-mins'),
+    secs: document.getElementById('cd-secs'),
   };
+  const ctaBtn = document.getElementById('ctaBtn');
+  const ctaLabel = document.getElementById('ctaLabel');
+  const ctaNote = document.getElementById('ctaNote');
+  const localStart = document.getElementById('localStart');
 
-  function buildGrid(){
-    gridEl.innerHTML = '';
-    for(let i=0;i<9;i++){
-      const c = document.createElement('button');
-      c.type = 'button';
-      c.className = 'ttt-cell';
-      c.dataset.i = i;
-      c.addEventListener('click', onCellClick);
-      gridEl.appendChild(c);
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function renderLocalStart(){
+    try{
+      const fmt = new Intl.DateTimeFormat(undefined, {
+        weekday:'short', month:'short', day:'numeric',
+        hour:'numeric', minute:'2-digit', timeZoneName:'short'
+      });
+      localStart.textContent = fmt.format(EVENT_START);
+    }catch(e){
+      localStart.textContent = EVENT_START.toString();
     }
   }
 
-  function newGame(){
-    board = Array(9).fill(null);
-    over = false;
-    statusText.textContent = "Your move — you're ×";
-    [...gridEl.children].forEach(c => {
-      c.textContent = '';
-      c.className = 'ttt-cell';
-      c.disabled = false;
-    });
+  function activateCta(){
+    ctaBtn.classList.remove('is-disabled');
+    ctaLabel.textContent = "Join Closed Beta →";
+    ctaNote.textContent = "We're live — jump in now.";
+    ctaNote.classList.add('is-live');
   }
 
-  function checkWinner(b){
-    for(const [a,c,d] of WINS){
-      if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
+  function tick(){
+    const diff = EVENT_START.getTime() - Date.now();
+    if(diff <= 0){
+      els.days.textContent = '00';
+      els.hours.textContent = '00';
+      els.mins.textContent = '00';
+      els.secs.textContent = '00';
+      activateCta();
+      clearInterval(timer);
+      return;
     }
-    return b.every(v => v) ? 'draw' : null;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    els.days.textContent = pad(d);
+    els.hours.textContent = pad(h);
+    els.mins.textContent = pad(m);
+    els.secs.textContent = pad(s);
   }
 
-  function line(kind){
-    const arr = STRANGER_LINES[kind];
-    return arr[Math.floor(Math.random()*arr.length)];
-  }
-
-  function endGame(winner){
-    over = true;
-    [...gridEl.children].forEach(c => c.disabled = true);
-    if(winner === 'X'){
-      scoreYou++; scoreYouEl.textContent = scoreYou;
-      statusText.textContent = "You won! " + line('lose');
-    } else if(winner === 'O'){
-      scoreStranger++; scoreStrangerEl.textContent = scoreStranger;
-      statusText.textContent = "Stranger won. " + line('win');
-    } else {
-      statusText.textContent = "Draw. " + line('draw');
-    }
-  }
-
-  function strangerMove(){
-    if(over) return;
-    const empties = board.map((v,i)=>v?null:i).filter(v=>v!==null);
-    if(!empties.length) return;
-    const i = empties[Math.floor(Math.random()*empties.length)];
-    board[i] = 'O';
-    const cell = gridEl.children[i];
-    cell.textContent = '○';
-    cell.className = 'ttt-cell o';
-    cell.disabled = true;
-    const winner = checkWinner(board);
-    if(winner){ endGame(winner === 'draw' ? 'draw' : 'O'); }
-    else { statusText.textContent = "Your move — you're ×"; }
-  }
-
-  function onCellClick(e){
-    const i = Number(e.currentTarget.dataset.i);
-    if(over || board[i]) return;
-    board[i] = 'X';
-    e.currentTarget.textContent = '×';
-    e.currentTarget.className = 'ttt-cell x';
-    e.currentTarget.disabled = true;
-    const winner = checkWinner(board);
-    if(winner){ endGame(winner === 'draw' ? 'draw' : 'X'); return; }
-    statusText.textContent = "Stranger's thinking…";
-    setTimeout(strangerMove, 550);
-  }
-
-  resetBtn.addEventListener('click', newGame);
-  buildGrid();
-  newGame();
+  renderLocalStart();
+  tick();
+  const timer = setInterval(tick, 1000);
 </script>
 
-<!-- Cloudflare Web Analytics -->
-<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2bc9e63644e445ee8a2cfc9e88d63f8e"}'></script>
-<!-- End Cloudflare Web Analytics -->
 </body>
 </html>
