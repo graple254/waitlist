@@ -251,7 +251,7 @@
       <div class="section-hdr" id="overview">Countdown To Next Test</div>
       <div class="lcd">
         <span id="countdownValue">--:--:--:--</span>
-        <span class="lcd-sub">DD&nbsp;&nbsp;HH&nbsp;&nbsp;MM&nbsp;&nbsp;SS</span>
+        <span class="lcd-sub" id="lcdSub">DD&nbsp;&nbsp;HH&nbsp;&nbsp;MM&nbsp;&nbsp;SS</span>
       </div>
       <p class="countdown-note" id="countdownNote">counting down to the next test window…</p>
 
@@ -313,7 +313,6 @@
           <td class="k">General feedback</td>
           <td class="v">
             What felt good, what felt off, whether you'd use it again.<br>
-            <!-- Replace with your real Feedback Google Form share link -->
             <a class="btn" style="margin-top:8px;" href="https://forms.gle/3vxqAcYiNBbypSnB9" target="_blank" rel="noopener">OPEN FEEDBACK FORM →</a>
           </td>
         </tr>
@@ -321,7 +320,6 @@
           <td class="k">Bug report</td>
           <td class="v">
             Something broke, froze, or looked wrong. Steps to reproduce help most.<br>
-            <!-- Replace with your real Bug Report Google Form share link -->
             <a class="btn" style="margin-top:8px;" href="https://forms.gle/eC8AAxaJEy17cNbH6" target="_blank" rel="noopener">OPEN BUG REPORT FORM →</a>
           </td>
         </tr>
@@ -330,7 +328,6 @@
       <div class="section-hdr" id="notify">Get Notified For The Next Round</div>
       <p class="lead" style="margin-bottom:10px;">Leave your email and we'll ping you before the next test window opens.</p>
 
-      <!-- Replace the action URL below with your own Formspree endpoint -->
       <form id="notifyForm" class="email-row" action="https://formspree.io/f/xbdvzpny" method="POST">
         <input type="email" name="email" id="email" required placeholder="you@example.com" aria-label="Email address">
         <button type="submit" class="btn primary" id="notifyBtn">NOTIFY ME</button>
@@ -375,29 +372,63 @@
     }
   })();
 
-  /* ============================================================
-     Countdown target: change this single line to update the event.
-     ISO 8601 with a Z (UTC) so every visitor's browser converts it
-     to their own local time automatically.
-     ============================================================ */
+  /* ================================================================
+     HOW TO SET THE TEST WINDOW — read this before touching the dates
+     ----------------------------------------------------------------
+     Two lines below control everything on this page: when the
+     "JOIN THE BETA" button unlocks (TEST_START) and when it locks
+     again (TEST_END). Everything else (the countdown, the note text,
+     the button state) updates itself automatically once these are set.
+
+     FORMAT: 'YYYY-MM-DDTHH:MM:SSZ'
+       YYYY-MM-DD  →  the date, e.g. 2026-08-01
+       T           →  just the letter T, always, it separates date from time
+       HH:MM:SS    →  the time, 24-hour clock, e.g. 18:00:00 means 6:00 PM
+       Z           →  means "this time is UTC". ALWAYS keep the Z.
+                       Do not put your own local time here directly —
+                       convert it to UTC first (see example below).
+                       The Z is what makes this work correctly for every
+                       visitor no matter what timezone they're in.
+
+     WORKED EXAMPLE:
+       Say you want the beta to open at 2:00 PM Pacific Time (PDT)
+       on August 1, 2026, and stay open for 4 hours (close at 6:00 PM PDT).
+       PDT is 7 hours behind UTC, so add 7 hours to get UTC:
+         2:00 PM PDT  + 7h  =  21:00 UTC   →  TEST_START = '2026-08-01T21:00:00Z'
+         6:00 PM PDT  + 7h  =  01:00 UTC (next day)  →  TEST_END = '2026-08-02T01:00:00Z'
+
+     DON'T WANT TO DO THE MATH?
+       Search "2pm PDT to UTC" on Google and it will convert it for you,
+       or use https://savvytime.com/converter — just type in your local
+       time and copy the UTC time it gives you into the strings below.
+
+     WHAT EACH SETTING CONTROLS:
+       TEST_START  →  before this time: countdown shows time until open,
+                       button stays greyed out.
+       TEST_END    →  between START and END: button is active, countdown
+                       shows time until close. After END: button greys
+                       out again automatically, no page reload needed.
+     ================================================================ */
   var TEST_START = new Date('2026-08-01T18:00:00Z');
+  var TEST_END   = new Date('2026-08-01T22:00:00Z');
 
   var valueEl = document.getElementById("countdownValue");
   var noteEl = document.getElementById("countdownNote");
+  var lcdSubEl = document.getElementById("lcdSub");
   var ctaBtn = document.getElementById("ctaBtn");
   var ctaHint = document.getElementById("ctaHint");
 
   function pad(n) { return String(n).padStart(2, "0"); }
 
-  function renderNote() {
+  function formatLocal(d) {
     try {
       var fmt = new Intl.DateTimeFormat(undefined, {
         weekday: 'short', month: 'short', day: 'numeric',
         hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
       });
-      noteEl.textContent = "next test starts " + fmt.format(TEST_START) + " your time";
+      return fmt.format(d);
     } catch (e) {
-      noteEl.textContent = "next test starts " + TEST_START.toString();
+      return d.toString();
     }
   }
 
@@ -407,16 +438,14 @@
     ctaHint.textContent = "we're live, jump in now";
   }
 
-  function tick() {
-    var diff = TEST_START.getTime() - Date.now();
-    if (diff <= 0) {
-      valueEl.textContent = "00:00:00:00";
-      noteEl.textContent = "the test window is live, or the schedule needs updating";
-      activateCta();
-      clearInterval(timer);
-      return;
-    }
-    var totalSeconds = Math.floor(diff / 1000);
+  function deactivateCta(label) {
+    ctaBtn.classList.add("is-disabled");
+    ctaBtn.textContent = "JOIN THE BETA";
+    ctaHint.textContent = label;
+  }
+
+  function renderDiff(diff) {
+    var totalSeconds = Math.max(Math.floor(diff / 1000), 0);
     var days = Math.floor(totalSeconds / 86400);
     var hours = Math.floor((totalSeconds % 86400) / 3600);
     var minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -424,7 +453,35 @@
     valueEl.textContent = pad(days) + ":" + pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
   }
 
-  renderNote();
+  function tick() {
+    var now = Date.now();
+
+    // state 1: before the window opens, count down to start, button stays locked
+    if (now < TEST_START.getTime()) {
+      renderDiff(TEST_START.getTime() - now);
+      lcdSubEl.textContent = "DD  HH  MM  SS";
+      noteEl.textContent = "next test starts " + formatLocal(TEST_START) + " your time";
+      deactivateCta("available when the countdown reaches zero");
+      return;
+    }
+
+    // state 2: window is open, count down to close, button unlocked
+    if (now < TEST_END.getTime()) {
+      renderDiff(TEST_END.getTime() - now);
+      lcdSubEl.textContent = "CLOSES IN";
+      noteEl.textContent = "open until " + formatLocal(TEST_END) + " your time";
+      activateCta();
+      return;
+    }
+
+    // state 3: window has closed, lock the button again
+    valueEl.textContent = "00:00:00:00";
+    lcdSubEl.textContent = "DD  HH  MM  SS";
+    noteEl.textContent = "this test window closed " + formatLocal(TEST_END) + " your time";
+    deactivateCta("this round has ended, check back for the next one");
+    clearInterval(timer);
+  }
+
   tick();
   var timer = setInterval(tick, 1000);
 
