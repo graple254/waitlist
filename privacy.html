@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>chichi :: privacy policy</title>
+<meta name="description" content="Chichi Privacy Policy — what we collect, why, and how to control it.">
+<style>
+  body{
+    margin:0; padding:24px 12px; background:#d4d0c8; color:#111111;
+    font-family:Verdana, Tahoma, Arial, Helvetica, sans-serif; font-size:13px; line-height:1.6;
+  }
+  a{ color:#0000cc; }
+  a:visited{ color:#551a8b; }
+  .frame{ width:840px; max-width:100%; margin:0 auto 20px; background:#ffffff; border:2px outset #d4d0c8; }
+  .titlebar{
+    background:linear-gradient(180deg,#123a7c,#0a2a5e); color:#ffffff; padding:7px 12px;
+    font-weight:bold; font-size:13px; display:flex; justify-content:space-between; align-items:center;
+    border-bottom:1px solid #061a42;
+  }
+  .titlebar .path{ font-family:"Courier New", Courier, monospace; letter-spacing:.02em; }
+  .titlebar .flag{
+    font-family:"Courier New", Courier, monospace; font-size:11px;
+    background:#1a6b1a; color:#e2f7e2; padding:2px 7px; border:1px solid #0e4a0e;
+  }
+  .subnav{
+    background:#f2f1ea; border-bottom:1px solid #cccccc; padding:6px 12px;
+    font-family:"Courier New", Courier, monospace; font-size:11px; color:#333333;
+  }
+  .subnav a{ color:#0a2a5e; text-decoration:none; }
+  .subnav a:hover{ text-decoration:underline; }
+  .subnav .sep{ color:#999999; padding:0 6px; }
+  .content{ padding:20px 22px 6px; }
+  h1{ font-size:21px; margin:0 0 4px; color:#111111; }
+  .updated{
+    font-family:"Courier New", Courier, monospace; font-size:11px; color:#666666; margin:0 0 16px;
+  }
+  .lead{ color:#333333; margin:0 0 16px; max-width:74ch; }
+  .section-hdr{
+    font-weight:bold; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:#0a2a5e; border-bottom:1px solid #0a2a5e; padding-bottom:3px; margin:22px 0 10px;
+  }
+  .section-hdr:first-of-type{ margin-top:0; }
+  p{ margin:0 0 10px; color:#333333; }
+  ul{ margin:0 0 10px; padding-left:20px; color:#333333; }
+  li{ margin-bottom:6px; }
+  table.kv{ width:100%; border-collapse:collapse; margin-bottom:12px; }
+  table.kv tr td{ padding:6px 8px; border:1px solid #d9d9d9; vertical-align:top; font-size:12px; }
+  table.kv tr td.k{ width:26%; background:#f2f1ea; font-weight:bold; color:#222222; }
+  table.kv tr td.v{ background:#ffffff; color:#333333; }
+  table.kv tr:nth-child(even) td.v{ background:#fafaf7; }
+  .footer{
+    border-top:1px solid #cccccc; margin-top:20px; padding:10px 22px 14px;
+    font-family:"Courier New", Courier, monospace; font-size:10px; color:#777777;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;
+  }
+  .note{
+    background:#f2f1ea; border:1px solid #cccccc; padding:10px 12px; margin:0 0 16px;
+    font-size:12px; color:#444444;
+  }
+  @media (max-width:520px){
+    table.kv tr td.k{ width:40%; }
+    .footer{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="titlebar">
+      <span class="path">chichi.quest / privacy</span>
+      <span class="flag">LEGAL</span>
+    </div>
+    <div class="subnav">
+      <a href="/">home</a><span class="sep">|</span>
+      <a href="/terms.html">terms of service</a><span class="sep">|</span>
+      <a href="mailto:info@chichi.quest">contact</a>
+    </div>
+
+    <div class="content">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: <!-- UPDATE THIS DATE WHENEVER YOU EDIT THIS PAGE --> July 14, 2026</p>
+
+      <div class="note">
+        This is a draft written to reflect how Chichi actually works today. It has not been reviewed by a lawyer.
+        Before publishing, have it checked against the laws that apply to where your users are (GDPR if you have
+        EU users, CCPA if you have California users, and so on).
+      </div>
+
+      <p class="lead">
+        Chichi ("we," "us") runs chichi.quest and beta.chichi.quest, a service that randomly pairs people over live
+        video to play multiplayer board games together. This page explains what information we collect, why, and
+        what control you have over it.
+      </p>
+
+      <div class="section-hdr">Who Can Use Chichi</div>
+      <p>Chichi is intended for users aged 18 and over. We do not knowingly collect data from anyone under 18. If you believe a minor is using Chichi, contact us at <a href="mailto:info@chichi.quest">info@chichi.quest</a> and we'll remove the account.</p>
+
+      <div class="section-hdr">What We Collect</div>
+      <table class="kv">
+        <tr>
+          <td class="k">Account info</td>
+          <td class="v">When you sign in with Google, we receive your name, email address, and profile photo from your Google account (via Google OAuth / django-allauth). We don't receive your Google password.</td>
+        </tr>
+        <tr>
+          <td class="k">Video &amp; audio</td>
+          <td class="v">Calls are peer-to-peer (WebRTC). Your video/audio stream goes directly to your matched partner's browser, or through our TURN relay server (turn.chichi.quest) only when a direct connection isn't possible. We do not record, store, or review call content.</td>
+        </tr>
+        <tr>
+          <td class="k">Gameplay data</td>
+          <td class="v">Which games you play, moves made during a match, and match outcomes, used to run the game and for basic product analytics.</td>
+        </tr>
+        <tr>
+          <td class="k">Beta signup email</td>
+          <td class="v">If you leave your email to be notified about upcoming test rounds, it's submitted through Formspree and used only to contact you about Chichi beta sessions.</td>
+        </tr>
+        <tr>
+          <td class="k">Feedback &amp; bug reports</td>
+          <td class="v">Feedback and bug reports are submitted through Google Forms and stored in a Google Sheet we control. Whatever you type into those forms (and any screenshots you attach) is what we receive.</td>
+        </tr>
+        <tr>
+          <td class="k">Technical data</td>
+          <td class="v">IP address, browser type, and device type, collected automatically for matchmaking, security, and debugging (standard web server logs).</td>
+        </tr>
+        <tr>
+          <td class="k">Cookies / local storage</td>
+          <td class="v">Used to keep you signed in and remember basic preferences. We don't use tracking cookies for advertising.</td>
+        </tr>
+      </table>
+
+      <div class="section-hdr">How We Use It</div>
+      <ul>
+        <li>To match you with another user and run the video call and game session</li>
+        <li>To maintain your account and let you sign back in</li>
+        <li>To respond to feedback and bug reports</li>
+        <li>To notify beta testers about upcoming sessions, if you opted in</li>
+        <li>To keep the service secure and diagnose problems</li>
+        <li>To improve matchmaking, game stability, and overall product quality</li>
+      </ul>
+      <p>We do not sell your personal data, and we do not use it for third-party advertising.</p>
+
+      <div class="section-hdr">Third-Party Services We Use</div>
+      <p>These services process some data on our behalf, each governed by their own privacy policy:</p>
+      <table class="kv">
+        <tr><td class="k">Google OAuth</td><td class="v">Sign-in. Governed by Google's Privacy Policy.</td></tr>
+        <tr><td class="k">Google Forms</td><td class="v">Feedback and bug report collection. Governed by Google's Privacy Policy.</td></tr>
+        <tr><td class="k">Formspree</td><td class="v">Beta notification email capture. Governed by Formspree's Privacy Policy.</td></tr>
+        <tr><td class="k">Amazon Web Services (AWS)</td><td class="v">Hosts our servers (EC2) and TURN relay. Governed by AWS's Privacy Policy.</td></tr>
+      </table>
+
+      <div class="section-hdr">Data Retention</div>
+      <p>Account data is kept while your account is active. Call content is never stored, it exists only for the duration of the live connection. Feedback, bug reports, and beta signup emails are kept until we no longer need them for the purpose they were collected for, or until you ask us to delete them.</p>
+
+      <div class="section-hdr">Your Rights</div>
+      <p>You can ask us to:</p>
+      <ul>
+        <li>Send you a copy of the personal data we hold about you</li>
+        <li>Correct inaccurate data</li>
+        <li>Delete your account and associated data</li>
+        <li>Stop receiving beta notification emails (or just unsubscribe via the email itself, once that's set up)</li>
+      </ul>
+      <p>To do any of this, email <a href="mailto:info@chichi.quest">info@chichi.quest</a>.</p>
+
+      <div class="section-hdr">Security</div>
+      <p>We use standard safeguards (HTTPS, access controls on our servers and admin tools) to protect your data. No system is perfectly secure, and we can't guarantee absolute protection against all threats.</p>
+
+      <div class="section-hdr">International Users</div>
+      <p>Our servers are hosted on AWS infrastructure, which may be located outside your home country. By using Chichi, you understand your data may be processed in a different jurisdiction than where you live.</p>
+
+      <div class="section-hdr">Changes To This Policy</div>
+      <p>We may update this policy as Chichi changes. We'll update the "Last updated" date at the top of this page when we do. Material changes will be flagged more visibly (e.g. a notice on the site).</p>
+
+      <div class="section-hdr">Contact</div>
+      <p>Questions about this policy or your data: <a href="mailto:info@chichi.quest">info@chichi.quest</a>.</p>
+    </div>
+
+    <div class="footer">
+      <span>chichi.quest</span>
+      <span><a href="/terms.html">terms of service</a></span>
+    </div>
+  </div>
+</body>
+</html>
