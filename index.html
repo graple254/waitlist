@@ -3,718 +3,547 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>chichi — meet a stranger, then beat them at something</title>
-<meta name="description" content="Chichi is live video & text chat with real multiplayer games built in. Match with a stranger, then challenge them to tic tac toe, checkers, sudoku or 3 men's morris — live.">
+<title>chichi :: beta test console</title>
+<meta name="description" content="Chichi pairs you with a stranger and hands you a game to play, live. Beta version test coming up: help us find what's broken before it goes public.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a1a'/%3E%3Ctext x='50' y='68' text-anchor='middle' fill='white' font-size='48' font-family='system-ui, sans-serif' font-weight='600'%3Ech%3C/text%3E%3C/svg%3E">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
-  :root{
-    --cream:#FFF8EF;
-    --ink:#241B2F;
-    --coral:#FF6B57;
-    --coral-deep:#E14B3E;
-    --mint:#2FC7AE;
-    --sunny:#FFC64B;
-    --lilac:#C9B6FF;
-    --card:#FFFFFF;
-    --line:#EFE4D2;
-  }
-
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
   body{
     margin:0;
-    background:
-      radial-gradient(circle, #EFE1CC 1px, transparent 1.4px) 0 0/26px 26px,
-      var(--cream);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
+    padding:24px 12px;
+    background:#d4d0c8;
+    color:#111111;
+    font-family:Verdana, Tahoma, Arial, Helvetica, sans-serif;
+    font-size:13px;
+    line-height:1.55;
+  }
+  a{ color:#0000cc; }
+  a:visited{ color:#551a8b; }
+
+  .frame{
+    width:840px;
+    max-width:100%;
+    margin:0 auto 20px;
+    background:#ffffff;
+    border:2px outset #d4d0c8;
   }
 
-  h1,.display-font{font-family:'Baloo 2',cursive;}
-
-  /* ---------- LAUNCH CURTAIN ---------- */
-  .curtain-backdrop{
-    position:fixed;
-    inset:0;
-    background:rgba(36,27,47,.4);
-    z-index:999;
-    opacity:0;
-    animation:backdropFade .4s ease .3s forwards;
-  }
-  .curtain-backdrop.is-closed{
-    animation:backdropFadeOut .4s ease forwards;
-  }
-  .curtain{
-    position:fixed;
-    top:50%; left:50%;
-    width:min(560px,90vw);
-    transform:translate(-50%,-320%);
-    background:linear-gradient(180deg,var(--coral),var(--coral-deep));
-    color:#fff;
-    border-radius:26px;
-    padding:2rem 2.6rem 2.2rem;
-    box-shadow:0 30px 60px -18px rgba(36,27,47,.55);
-    z-index:1000;
-    text-align:center;
-    animation:curtainDrop .9s cubic-bezier(.34,1.56,.64,1) .5s forwards;
-  }
-  .curtain.is-closed{
-    animation:curtainRise .45s ease forwards;
-  }
-  .curtain::after{
-    content:'';
-    position:absolute;
-    left:0; right:0; bottom:-14px; height:18px;
-    background-image:radial-gradient(circle at 14px 0, transparent 14px, var(--coral-deep) 14.5px);
-    background-size:28px 18px;
-    background-repeat:repeat-x;
-  }
-  .curtain-tassels{
-    position:absolute;
-    left:0; right:0; bottom:-30px;
+  .titlebar{
+    background:linear-gradient(180deg,#123a7c,#0a2a5e);
+    color:#ffffff;
+    padding:7px 12px;
+    font-weight:bold;
+    font-size:13px;
     display:flex;
-    justify-content:space-evenly;
-    padding:0 30px;
-  }
-  .curtain-tassels span{
-    width:9px;height:9px;border-radius:50%;
-    background:var(--sunny);
-    box-shadow:0 7px 0 -1px var(--mint);
-  }
-  .curtain-content{
-    display:flex;
-    flex-direction:column;
+    justify-content:space-between;
     align-items:center;
-    gap:.5rem;
+    border-bottom:1px solid #061a42;
   }
-  .curtain-icon{font-size:2.6rem;}
-  .curtain-text{display:flex; flex-direction:column; line-height:1.3;}
-  .curtain-text strong{
-    font-family:'Baloo 2',cursive;
-    font-size:clamp(1.3rem,3vw,1.7rem);
-    font-weight:700;
-  }
-  .curtain-text span{
-    font-size:1rem;
-    opacity:.94;
-    font-weight:500;
-    margin-top:.2rem;
-  }
-  .curtain-text span b{font-weight:800;}
-  .curtain-close{
-    position:absolute;
-    top:.7rem; right:.7rem;
-    background:rgba(255,255,255,.18);
-    border:none;
-    color:#fff;
-    width:30px;height:30px;
-    border-radius:50%;
-    font-size:1rem;
-    line-height:1;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .curtain-close:hover{background:rgba(255,255,255,.32);}
-
-  @keyframes curtainDrop{
-    from{transform:translate(-50%,-320%);}
-    to{transform:translate(-50%,-50%);}
-  }
-  @keyframes curtainRise{
-    from{transform:translate(-50%,-50%); opacity:1;}
-    to{transform:translate(-50%,-320%); opacity:1;}
-  }
-  @keyframes backdropFade{ from{opacity:0;} to{opacity:1;} }
-  @keyframes backdropFadeOut{ from{opacity:1;} to{opacity:0;} }
-
-  @media (prefers-reduced-motion:reduce){
-    .curtain{animation:none; transform:translate(-50%,-50%);}
-    .curtain-backdrop{animation:none; opacity:1;}
+  .titlebar .path{ font-family:"Courier New", Courier, monospace; letter-spacing:.02em; }
+  .titlebar .flag{
+    font-family:"Courier New", Courier, monospace;
+    font-size:11px;
+    background:#7a5200;
+    color:#fff2d9;
+    padding:2px 7px;
+    border:1px solid #543800;
   }
 
-  /* ---------- NAV ---------- */
-  .navbar-chichi{
-    padding:1rem clamp(1.25rem,4vw,3.5rem) 0;
-    flex-shrink:0;
+  .subnav{
+    background:#f2f1ea;
+    border-bottom:1px solid #cccccc;
+    padding:6px 12px;
+    font-family:"Courier New", Courier, monospace;
+    font-size:11px;
+    color:#333333;
   }
-  .logo{
-    font-family:'Baloo 2',cursive;
-    font-weight:800;
-    font-size:1.45rem;
-    color:var(--ink);
+  .subnav a{ color:#0a2a5e; text-decoration:none; }
+  .subnav a:hover{ text-decoration:underline; }
+  .subnav .sep{ color:#999999; padding:0 6px; }
+
+  .content{ padding:20px 22px 6px; }
+
+  h1{
+    font-family:Verdana, Tahoma, Arial, sans-serif;
+    font-size:21px;
+    margin:0 0 6px;
+    color:#111111;
   }
-  .logo span.dot{color:var(--coral);}
-  .beta-badge{
-    font-family:'Inter',sans-serif;
-    font-size:.62rem;
-    font-weight:700;
+  h2{
+    font-size:14px;
+    color:#0a2a5e;
+    margin:0 0 4px;
+  }
+
+  .lead{ color:#333333; margin:0 0 16px; max-width:74ch; }
+
+  .section-hdr{
+    font-weight:bold;
+    font-size:11px;
     letter-spacing:.06em;
-    background:var(--lilac);
-    color:var(--ink);
-    padding:.15rem .5rem;
-    border-radius:999px;
-    vertical-align:middle;
-    margin-left:.4rem;
-  }
-  .btn-notify-nav{
-    background:var(--ink);
-    color:var(--cream);
-    border:none;
-    border-radius:999px;
-    padding:.5rem 1.15rem;
-    font-weight:600;
-    font-size:.82rem;
-  }
-  .btn-notify-nav:hover{background:var(--coral); color:var(--ink);}
-
-  /* ---------- HERO ---------- */
-  .hero-wrap{
-    flex:1 1 auto;
-    display:flex;
-    align-items:center;
-    padding:clamp(.75rem,2vh,1.5rem) clamp(1.25rem,4vw,3.5rem);
-  }
-
-  .eyebrow{
-    display:inline-flex;
-    align-items:center;
-    gap:.4rem;
-    background:#fff;
-    border:1px solid var(--line);
-    color:var(--coral);
-    font-weight:600;
-    font-size:.76rem;
-    padding:.32rem .75rem;
-    border-radius:999px;
-    margin-bottom:.85rem;
-  }
-
-  h1.headline{
-    font-size:clamp(1.7rem,3.2vw,2.85rem);
-    font-weight:800;
-    line-height:1.1;
-    margin-bottom:.7rem;
-  }
-  h1.headline .hl{
-    color:var(--coral);
-    position:relative;
-    white-space:nowrap;
-  }
-  h1.headline .hl svg{
-    position:absolute;
-    left:0; bottom:-.14em;
-    width:100%; height:.3em;
-  }
-
-  .lead-copy{
-    font-size:clamp(.9rem,1.05vw,1.02rem);
-    color:#5B5064;
-    max-width:32rem;
-    margin-bottom:1.1rem;
-  }
-  .lead-copy strong{color:var(--ink);}
-
-  .chip-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:.4rem;
-    margin-bottom:1.2rem;
-  }
-  .chip{
-    display:inline-flex;
-    align-items:center;
-    gap:.35rem;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:.32rem .7rem;
-    font-size:.75rem;
-    font-weight:600;
-    color:var(--ink);
-  }
-  .chip i{font-size:.82rem; color:var(--mint);}
-  .chip.game i{color:var(--coral);}
-
-  .email-form{
-    display:flex;
-    gap:.5rem;
-    max-width:25rem;
-  }
-  .email-form input{
-    border-radius:999px;
-    border:1.5px solid var(--line);
-    padding:.6rem 1.05rem;
-    font-size:.88rem;
-    flex:1;
-  }
-  .email-form input:focus{
-    box-shadow:0 0 0 3px rgba(255,107,87,.18);
-    border-color:var(--coral);
-    outline:none;
-  }
-  .btn-cta{
-    background:var(--coral);
-    color:#fff;
-    border:none;
-    border-radius:999px;
-    padding:.6rem 1.3rem;
-    font-weight:700;
-    font-size:.88rem;
-    white-space:nowrap;
-    transition:transform .15s ease, background .15s ease;
-  }
-  .btn-cta:hover{background:#ff5540; transform:translateY(-1px);}
-  .btn-cta:disabled{opacity:.7; transform:none;}
-
-  .form-note{
-    font-size:.74rem;
-    color:#9A8FA3;
-    margin-top:.55rem;
-  }
-  .form-note a{color:var(--mint); text-decoration:none; font-weight:600;}
-  .form-note a:hover{text-decoration:underline;}
-
-  .form-status{
-    font-size:.8rem;
-    font-weight:600;
-    margin-top:.5rem;
-    min-height:1.1em;
-  }
-  .form-status.ok{color:var(--mint);}
-  .form-status.err{color:var(--coral);}
-
-  /* ---------- SIGNATURE: LIVE PLAYABLE DEMO ---------- */
-  .demo-col{
-    display:flex;
-    justify-content:center;
-  }
-  .call-card{
-    width:min(370px,100%);
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:24px;
-    box-shadow:0 26px 55px -22px rgba(36,27,47,.3);
-    transform:rotate(-1.3deg);
-    padding:1rem 1.1rem 1.1rem;
-  }
-  .browser-topbar{
-    display:flex;
-    gap:.32rem;
-    margin-bottom:.75rem;
-  }
-  .browser-topbar span{width:8px;height:8px;border-radius:50%;background:var(--line);}
-  .browser-topbar span:nth-child(1){background:var(--coral);}
-  .browser-topbar span:nth-child(2){background:var(--sunny);}
-  .browser-topbar span:nth-child(3){background:var(--mint);}
-
-  .participants{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:.6rem;
-    margin-bottom:.4rem;
-  }
-  .avatar{
-    width:44px;height:44px;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.25rem;
-    position:relative;
-    flex-shrink:0;
-  }
-  .avatar.you{background:#FFEADB; color:var(--coral);}
-  .avatar.stranger{background:#E4F7F3; color:var(--mint);}
-  .avatar .dot{
-    position:absolute; top:0; right:0;
-    width:9px;height:9px;border-radius:50%;
-    background:#3ecf6a; border:2px solid #fff;
-  }
-  .link-line{
-    flex:1;
-    max-width:60px;
-    height:0;
-    border-top:2px dashed var(--line);
-  }
-
-  .matched-tag{
-    text-align:center;
-    font-size:.72rem;
-    font-weight:700;
-    color:#8A7F92;
-    margin-bottom:.7rem;
-  }
-
-  .game-panel{
-    background:var(--cream);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:.85rem;
-  }
-  .game-panel-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:.55rem;
-  }
-  .game-panel-head .label{
-    font-size:.68rem;
-    font-weight:700;
     text-transform:uppercase;
-    letter-spacing:.05em;
-    color:var(--coral);
-    display:flex;
-    align-items:center;
-    gap:.3rem;
+    color:#0a2a5e;
+    border-bottom:1px solid #0a2a5e;
+    padding-bottom:3px;
+    margin:22px 0 10px;
   }
-  .score{
-    font-size:.72rem;
-    font-weight:700;
-    color:var(--ink);
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:.15rem .55rem;
-  }
-  .score b{color:var(--coral);}
-  .score b.o{color:var(--mint);}
+  .section-hdr:first-of-type{ margin-top:0; }
 
-  .ttt-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:6px;
-    margin-bottom:.55rem;
+  table.kv{ width:100%; border-collapse:collapse; margin-bottom:4px; }
+  table.kv tr td{ padding:6px 8px; border:1px solid #d9d9d9; vertical-align:top; font-size:12px; }
+  table.kv tr td.k{ width:30%; background:#f2f1ea; font-weight:bold; color:#222222; }
+  table.kv tr td.v{ background:#ffffff; color:#333333; }
+  table.kv tr:nth-child(even) td.v{ background:#fafaf7; }
+
+  /* countdown / cta */
+  .lcd{
+    background:#0c0f0a; border:2px inset #666666; padding:12px 14px;
+    font-family:"Courier New", Courier, monospace; color:#4fe84f;
+    font-size:24px; letter-spacing:.08em; text-align:center; margin-bottom:8px;
   }
-  .ttt-cell{
-    aspect-ratio:1/1;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:9px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Baloo 2',cursive;
-    font-weight:700;
-    font-size:1.35rem;
+  .lcd .lcd-sub{ display:block; font-size:9px; letter-spacing:.12em; color:#2f8f2f; margin-top:4px; }
+  .countdown-note{ font-size:11px; color:#555555; font-family:"Courier New", Courier, monospace; margin:0 0 12px; }
+
+  .btn{
+    display:inline-block;
+    background:#e8e6dd;
+    border:2px outset #d4d0c8;
+    color:#111111 !important;
+    font-family:Verdana, Tahoma, Arial, sans-serif;
+    font-weight:bold;
+    font-size:12px;
+    padding:8px 16px;
+    text-decoration:none !important;
     cursor:pointer;
-    color:var(--ink);
-    transition:background .12s ease, transform .1s ease;
-    padding:0;
   }
-  .ttt-cell:hover:not(:disabled){background:#FFF1E6; transform:scale(1.03);}
-  .ttt-cell:disabled{cursor:default;}
-  .ttt-cell.x{color:var(--coral);}
-  .ttt-cell.o{color:var(--mint);}
+  .btn:active{ border-style:inset; }
+  .btn.is-disabled{ color:#888888 !important; cursor:not-allowed; pointer-events:none; }
+  .btn.primary{ background:#0a2a5e; border-color:#123a7c #061a42 #061a42 #123a7c; color:#ffffff !important; }
+  .btn.primary.is-disabled{ background:#a7a49a; color:#e2e0d8 !important; }
 
-  .game-status{
+  /* figures grid */
+  .fig-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:6px;
+  }
+  .fig{
+    border:1px solid #999999; background:#f7f6f1; cursor:pointer;
+  }
+  .fig:hover{ border-color:#0a2a5e; }
+  .fig:focus{ outline:2px solid #0a2a5e; outline-offset:-2px; }
+  .fig img{ display:block; width:100%; border-bottom:1px solid #999999; }
+  .fig-cap{
+    font-family:"Courier New", Courier, monospace;
+    font-size:10.5px; color:#333333; padding:6px 8px; line-height:1.4;
+  }
+  .fig-cap b{ color:#0a2a5e; }
+
+  /* email form */
+  .email-row{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px;
+  }
+  .email-row input[type="email"]{
+    flex:1; min-width:200px;
+    font-family:"Courier New", Courier, monospace;
+    font-size:12px;
+    padding:8px 9px;
+    border:1px solid #999999;
+    background:#ffffff;
+  }
+  .form-status{ font-family:"Courier New", Courier, monospace; font-size:11px; margin:6px 0 0; min-height:1.2em; }
+  .form-status.ok{ color:#1a6b1a; }
+  .form-status.err{ color:#a01414; }
+
+  .faq-item{ border-top:1px solid #e2e0d5; padding:10px 0; }
+  .faq-item:first-child{ border-top:none; }
+  .faq-q{ font-weight:bold; font-size:12px; color:#111111; margin-bottom:3px; }
+  .faq-a{ font-size:12px; color:#444444; margin:0; }
+
+  .footer{
+    border-top:1px solid #cccccc;
+    margin-top:20px;
+    padding:10px 22px 14px;
+    font-family:"Courier New", Courier, monospace;
+    font-size:10px;
+    color:#777777;
     display:flex;
     justify-content:space-between;
-    align-items:center;
-    gap:.5rem;
-  }
-  .game-status span{
-    font-size:.76rem;
-    color:#7A6E82;
-    font-weight:500;
-  }
-  .btn-reset{
-    background:none;
-    border:1px solid var(--line);
-    border-radius:999px;
-    width:26px;height:26px;
-    display:flex;align-items:center;justify-content:center;
-    color:var(--ink);
-    font-size:.8rem;
-    flex-shrink:0;
-  }
-  .btn-reset:hover{background:#fff; border-color:var(--coral); color:var(--coral);}
-
-  .try-hint{
-    text-align:center;
-    font-size:.72rem;
-    color:#9A8FA3;
-    margin-top:.65rem;
   }
 
-  /* ---------- FOOTER ---------- */
-  footer.chichi-footer{
-    flex-shrink:0;
-    text-align:center;
-    font-size:.74rem;
-    color:#A99EAF;
-    padding:.5rem 1rem 1rem;
+  /* lightbox */
+  .lightbox{
+    display:none;
+    position:fixed; inset:0; z-index:200;
+    background:rgba(10,10,10,.92);
+    flex-direction:column;
+  }
+  .lightbox.is-open{ display:flex; }
+  .lightbox-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 16px;
+    font-family:"Courier New", Courier, monospace;
+    color:#eeeeee; font-size:12px;
+    border-bottom:1px solid #444444;
+  }
+  .lightbox-track{
+    flex:1;
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+  }
+  .lightbox-slide{
+    flex:0 0 100%;
+    scroll-snap-align:center;
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+  }
+  .lightbox-slide img{
+    max-width:100%; max-height:78vh;
+    border:1px solid #555555;
+  }
+  .lightbox-nav{
+    display:flex; justify-content:center; align-items:center; gap:16px;
+    padding:12px 16px 16px;
   }
 
-  @media (max-width:991px){
-    .demo-col{margin-top:1.5rem;}
+  @media (max-width:720px){
+    .fig-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+  @media (max-width:520px){
+    .fig-grid{ grid-template-columns:1fr; }
+    table.kv tr td.k{ width:40%; }
+    .footer{ flex-direction:column; gap:4px; }
   }
 </style>
 </head>
 <body>
-
-<div class="curtain-backdrop" id="curtainBackdrop"></div>
-<div class="curtain" id="curtain">
-  <button class="curtain-close" id="curtainClose" aria-label="Dismiss">&times;</button>
-  <div class="curtain-content">
-    <span class="curtain-icon">🎭</span>
-    <div class="curtain-text">
-      <strong>Curtains Drop on Monday, July 13</strong>
-      <span id="curtainCountdown">counting down…</span>
+  <div class="frame">
+    <div class="titlebar">
+      <span class="path">chichi.quest / beta-test-console</span>
+      <span class="flag">BOARD GAMES BETA</span>
     </div>
-  </div>
-  <div class="curtain-tassels"><span></span><span></span><span></span><span></span><span></span></div>
-</div>
+    <div class="subnav">
+      <a href="#overview">overview</a><span class="sep">|</span>
+      <a href="#features">features</a><span class="sep">|</span>
+      <a href="#report">feedback / bugs</a><span class="sep">|</span>
+      <a href="#notify">notify me</a><span class="sep">|</span>
+      <a href="#faq">faq</a>
+    </div>
 
-<nav class="navbar-chichi d-flex justify-content-between align-items-center">
-  <div class="logo">chichi<span class="dot">.</span><span class="beta-badge">beta</span></div>
-  <button class="btn-notify-nav" onclick="document.getElementById('email').focus()">Reserve my spot</button>
-</nav>
+    <div class="content">
+      <h1>Real Opponents. Real Boards. No Bots.</h1>
+      <p class="lead">
+        Chichi is multiplayer board games (Tic Tac Toe, Checkers, Three Men's Morris, Sudoku) played against an
+        actual stranger, not a computer wearing a fake username. Live video runs alongside every match for one reason:
+        it's proof you're playing a real person, not the illusion of one. This round is a closed test of the games
+        themselves before we open things up further.
+      </p>
 
-<div class="hero-wrap">
-  <div class="row align-items-center g-4 w-100">
+      <table class="kv" style="margin-bottom:16px;">
+        <tr><td class="k">Most board game apps</td><td class="v">Match you to "Player_4821", usually a bot, sometimes nobody at all</td></tr>
+        <tr><td class="k">Chichi</td><td class="v">Matches you to a real person, on camera, in the same match</td></tr>
+      </table>
 
-    <div class="col-lg-6">
-      <div class="eyebrow"><i class="bi bi-controller"></i> The most fun way to meet new people online</div>
+      <p class="lead" style="margin-bottom:16px;">
+        <b>Coming soon, not in this round:</b> avatars (so playing doesn't require showing your face once trust is
+        established) and leaderboards (so wins actually count for something). This test is scoped to the four games only.
+      </p>
 
-      <h1 class="headline">Afraid of meeting new people.<br>Then <span class="hl">break the ice with</span> board games.
-      </h1>
-
-      <p class="lead-copy">Chichi is live video &amp; text chat with real multiplayer games baked in. <strong> Whether it's Checkers, Tic Tac Toe, Sudoku or more,</strong> games make conversations natural.</p>
-
-      <div class="chip-row">
-        <span class="chip"><i class="bi bi-camera-video-fill"></i> Video chat</span>
-        <span class="chip"><i class="bi bi-chat-dots-fill"></i> Text chat</span>
-        <span class="chip game"><i class="bi bi-grid-3x3"></i> Tic Tac Toe</span>
-        <span class="chip game"><i class="bi bi-dice-5-fill"></i> Checkers</span>
-        <span class="chip game"><i class="bi bi-triangle"></i> 3 Men's Morris</span>
-        <span class="chip game"><i class="bi bi-grid-3x3-gap-fill"></i> Sudoku</span>
+      <div class="section-hdr" id="overview">Countdown To Next Test</div>
+      <div class="lcd">
+        <span id="countdownValue">--:--:--:--</span>
+        <span class="lcd-sub">DD&nbsp;&nbsp;HH&nbsp;&nbsp;MM&nbsp;&nbsp;SS</span>
       </div>
+      <p class="countdown-note" id="countdownNote">counting down to the next test window…</p>
 
-      <form id="notifyForm" class="email-form" action="https://formspree.io/f/xbdvzpny" method="POST" novalidate>
-        <input type="email" name="email" id="email" required placeholder="you@example.com" aria-label="Email address">
-        <button type="submit" class="btn-cta" id="notifyBtn">Reserve my spot</button>
-      </form>
-      <div class="form-status" id="formStatus" role="status"></div>
-      <div class="form-note"><i class="bi bi-shield-check"></i> No spam, Exclusive invitations to beta play sessions and Early access before public launch. Email us directly at <a href="mailto:info@chichi.quest">info@chichi.quest</a></div>
-    </div>
+      <a href="https://beta.chichi.quest" class="btn primary is-disabled" id="ctaBtn" target="_blank" rel="noopener">JOIN THE BETA</a>
+      <span style="font-family:'Courier New',monospace;font-size:11px;color:#555555;margin-left:8px;" id="ctaHint">unlocks when the countdown hits zero</span>
 
-    <div class="col-lg-6">
-      <div class="demo-col">
-        <div class="call-card">
-          <div class="browser-topbar"><span></span><span></span><span></span></div>
+      <table class="kv" style="margin-top:16px;">
+        <tr><td class="k">Access</td><td class="v">Invite only, limited spots per round</td></tr>
+        <tr><td class="k">Cost</td><td class="v">Free</td></tr>
+        <tr><td class="k">Requirements</td><td class="v">A browser, a camera/mic, nothing to install</td></tr>
+      </table>
 
-          <div class="participants">
-            <div class="avatar you"><i class="bi bi-emoji-sunglasses"></i><span class="dot"></span></div>
-            <div class="link-line"></div>
-            <div class="avatar stranger"><i class="bi bi-emoji-wink"></i><span class="dot"></span></div>
-          </div>
-          <div class="matched-tag">🎉 matched — say hi, then make a move</div>
+      <div class="section-hdr" id="features">What's Being Tested: Board Games Only</div>
+      <p class="lead" style="margin-bottom:14px;">This round is scoped to the four games and the matchmaking that pairs you with a real opponent, not avatars, not leaderboards, not ranking. Click any image below to view them full size.</p>
 
-          <div class="game-panel">
-            <div class="game-panel-head">
-              <span class="label"><i class="bi bi-joystick"></i> Tic Tac Toe</span>
-              <span class="score">You <b id="scoreYou">0</b> · <b class="o" id="scoreStranger">0</b> Stranger</span>
-            </div>
-
-            <div class="ttt-grid" id="tttGrid"></div>
-
-            <div class="game-status">
-              <span id="gameStatus">Your move — you're ×</span>
-              <button type="button" class="btn-reset" id="resetGame" title="New game" aria-label="New game"><i class="bi bi-arrow-clockwise"></i></button>
-            </div>
-          </div>
-          <div class="try-hint">go ahead, actually click a square 👆</div>
+      <div class="fig-grid">
+        <div class="fig" data-lightbox-index="0" tabindex="0" role="button" aria-label="Open connect screen image">
+          <img src="/assets/static/connect.png" alt="Connect screen showing all games">
+          <div class="fig-cap"><b>FIG. 1</b> Connect screen. Where a match starts and you pick or get shown a game.</div>
+        </div>
+        <div class="fig" data-lightbox-index="1" tabindex="0" role="button" aria-label="Open Tic Tac Toe image">
+          <img src="/assets/static/tic-tac-toe.png" alt="Tic Tac Toe gameplay">
+          <div class="fig-cap"><b>FIG. 2</b> Tic Tac Toe with your opponent's video alongside the board.</div>
+        </div>
+        <div class="fig" data-lightbox-index="2" tabindex="0" role="button" aria-label="Open Checkers image">
+          <img src="/assets/static/checkers.png" alt="Checkers gameplay">
+          <div class="fig-cap"><b>FIG. 3</b> Checkers full match. Move validation under test.</div>
+        </div>
+        <div class="fig" data-lightbox-index="3" tabindex="0" role="button" aria-label="Open Sudoku image">
+          <img src="/assets/static/sudoku.png" alt="Sudoku gameplay">
+          <div class="fig-cap"><b>FIG. 4</b> Sudoku, co-op mode. Shared board state under test.</div>
         </div>
       </div>
+
+      <!-- Lightbox: click a thumbnail above, scroll horizontally (or use PREV/NEXT) to see the rest -->
+      <div class="lightbox" id="lightbox" aria-hidden="true">
+        <div class="lightbox-bar">
+          <span id="lightboxCaption">FIG. 1</span>
+          <button type="button" class="btn" id="lightboxClose">[ X CLOSE ]</button>
+        </div>
+        <div class="lightbox-track" id="lightboxTrack">
+          <div class="lightbox-slide"><img src="/assets/static/connect.png" alt="Connect screen showing all games"></div>
+          <div class="lightbox-slide"><img src="/assets/static/tic-tac-toe.png" alt="Tic Tac Toe gameplay"></div>
+          <div class="lightbox-slide"><img src="/assets/static/checkers.png" alt="Checkers gameplay"></div>
+          <div class="lightbox-slide"><img src="/assets/static/sudoku.png" alt="Sudoku gameplay"></div>
+        </div>
+        <div class="lightbox-nav">
+          <button type="button" class="btn" id="lightboxPrev">&larr; PREV</button>
+          <span id="lightboxCount" style="font-family:'Courier New',monospace;font-size:11px;color:#cccccc;">1 / 4</span>
+          <button type="button" class="btn" id="lightboxNext">NEXT &rarr;</button>
+        </div>
+      </div>
+
+      <div class="section-hdr" id="report">Feedback &amp; Bug Reports</div>
+      <p class="lead" style="margin-bottom:14px;">Two separate forms, on purpose: feedback goes to product, bugs go straight to the tracker. Use whichever fits what you found.</p>
+
+      <table class="kv" style="margin-bottom:16px;">
+        <tr>
+          <td class="k">General feedback</td>
+          <td class="v">
+            What felt good, what felt off, whether you'd use it again.<br>
+            <!-- Replace with your real Feedback Google Form share link -->
+            <a class="btn" style="margin-top:8px;" href="https://forms.gle/REPLACE_WITH_FEEDBACK_FORM_ID" target="_blank" rel="noopener">OPEN FEEDBACK FORM →</a>
+          </td>
+        </tr>
+        <tr>
+          <td class="k">Bug report</td>
+          <td class="v">
+            Something broke, froze, or looked wrong. Steps to reproduce help most.<br>
+            <!-- Replace with your real Bug Report Google Form share link -->
+            <a class="btn" style="margin-top:8px;" href="https://forms.gle/REPLACE_WITH_BUG_REPORT_FORM_ID" target="_blank" rel="noopener">OPEN BUG REPORT FORM →</a>
+          </td>
+        </tr>
+      </table>
+
+      <div class="section-hdr" id="notify">Get Notified For The Next Round</div>
+      <p class="lead" style="margin-bottom:10px;">Leave your email and we'll ping you before the next test window opens.</p>
+
+      <!-- Replace the action URL below with your own Formspree endpoint -->
+      <form id="notifyForm" class="email-row" action="https://formspree.io/f/xbdvzpny" method="POST">
+        <input type="email" name="email" id="email" required placeholder="you@example.com" aria-label="Email address">
+        <button type="submit" class="btn primary" id="notifyBtn">NOTIFY ME</button>
+      </form>
+      <div class="form-status" id="formStatus" role="status"></div>
+
+      <div class="section-hdr" id="faq">FAQ</div>
+      <div class="faq-item">
+        <div class="faq-q">Is Chichi free?</div>
+        <p class="faq-a">Yes. The beta test is completely free.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why are you running a beta?</div>
+        <p class="faq-a">We want to improve Chichi with real feedback before public launch.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens after this round?</div>
+        <p class="faq-a">We'll review feedback and bug reports, fix what's broken, and invite more users in future rounds.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I have to show my face?</div>
+        <p class="faq-a">For now, yes. Live video is how we confirm you're playing a real person. Avatars are coming, which will make this optional.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are leaderboards live?</div>
+        <p class="faq-a">Not yet. This round is scoped to the games themselves. Leaderboards are planned for a future round.</p>
+      </div>
     </div>
 
+    <div class="footer">
+      <span>generated by chichi-beta-console</span>
+      <span id="renderedAt">rendered --</span>
+    </div>
   </div>
-</div>
 
-<footer class="chichi-footer">Built solo, one board at a time · launching soon</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  /* ---------- Launch curtain ---------- */
-  (function(){
-    const curtain = document.getElementById('curtain');
-    const backdrop = document.getElementById('curtainBackdrop');
-    const closeBtn = document.getElementById('curtainClose');
-    const countdownEl = document.getElementById('curtainCountdown');
-    const LAUNCH = new Date('2026-07-13T00:00:00');
-    let autoCloseTimer = setTimeout(closeCurtain, 10000);
-    let closed = false;
-
-    function tick(){
-      const diff = LAUNCH - new Date();
-      if(diff <= 0){
-        countdownEl.innerHTML = "We're <b>live</b> now 🎉";
-        return;
-      }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      countdownEl.innerHTML = `<b>${d}d ${h}h ${m}m</b> left`;
+  (function () {
+    var stamp = document.getElementById("renderedAt");
+    if (stamp) {
+      var now = new Date();
+      stamp.textContent = "rendered " + now.toISOString().replace("T", " ").slice(0, 19) + " UTC";
     }
-    tick();
-    setInterval(tick, 30000);
-
-    function closeCurtain(){
-      if(closed) return;
-      closed = true;
-      clearTimeout(autoCloseTimer);
-      curtain.classList.add('is-closed');
-      backdrop.classList.add('is-closed');
-      setTimeout(() => {
-        curtain.style.display = 'none';
-        backdrop.style.display = 'none';
-      }, 450);
-    }
-
-    closeBtn.addEventListener('click', closeCurtain);
-    backdrop.addEventListener('click', closeCurtain);
   })();
 
-  /* ---------- Formspree email capture ---------- */
-  const form = document.getElementById('notifyForm');
-  const btn = document.getElementById('notifyBtn');
-  const statusEl = document.getElementById('formStatus');
+  /* ============================================================
+     Countdown target: change this single line to update the event.
+     ISO 8601 with a Z (UTC) so every visitor's browser converts it
+     to their own local time automatically.
+     ============================================================ */
+  var TEST_START = new Date('2026-08-01T18:00:00Z');
 
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    const originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = "Sending…";
-    statusEl.textContent = '';
-    statusEl.className = 'form-status';
+  var valueEl = document.getElementById("countdownValue");
+  var noteEl = document.getElementById("countdownNote");
+  var ctaBtn = document.getElementById("ctaBtn");
+  var ctaHint = document.getElementById("ctaHint");
 
-    try{
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function renderNote() {
+    try {
+      var fmt = new Intl.DateTimeFormat(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
       });
-      if(res.ok){
-        statusEl.textContent = "You're on the list 🎉 — see you at launch.";
-        statusEl.className = 'form-status ok';
+      noteEl.textContent = "next test starts " + fmt.format(TEST_START) + " your time";
+    } catch (e) {
+      noteEl.textContent = "next test starts " + TEST_START.toString();
+    }
+  }
+
+  function activateCta() {
+    ctaBtn.classList.remove("is-disabled");
+    ctaBtn.textContent = "JOIN THE BETA →";
+    ctaHint.textContent = "we're live, jump in now";
+  }
+
+  function tick() {
+    var diff = TEST_START.getTime() - Date.now();
+    if (diff <= 0) {
+      valueEl.textContent = "00:00:00:00";
+      noteEl.textContent = "the test window is live, or the schedule needs updating";
+      activateCta();
+      clearInterval(timer);
+      return;
+    }
+    var totalSeconds = Math.floor(diff / 1000);
+    var days = Math.floor(totalSeconds / 86400);
+    var hours = Math.floor((totalSeconds % 86400) / 3600);
+    var minutes = Math.floor((totalSeconds % 3600) / 60);
+    var seconds = totalSeconds % 60;
+    valueEl.textContent = pad(days) + ":" + pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
+  }
+
+  renderNote();
+  tick();
+  var timer = setInterval(tick, 1000);
+
+  /* lightbox gallery */
+  (function () {
+    var captions = [
+      "FIG. 1 — Connect screen",
+      "FIG. 2 — Tic Tac Toe",
+      "FIG. 3 — Checkers",
+      "FIG. 4 — Sudoku"
+    ];
+    var figs = document.querySelectorAll(".fig");
+    var lightbox = document.getElementById("lightbox");
+    var track = document.getElementById("lightboxTrack");
+    var slides = track.querySelectorAll(".lightbox-slide");
+    var captionEl = document.getElementById("lightboxCaption");
+    var countEl = document.getElementById("lightboxCount");
+    var closeBtn = document.getElementById("lightboxClose");
+    var prevBtn = document.getElementById("lightboxPrev");
+    var nextBtn = document.getElementById("lightboxNext");
+    var current = 0;
+
+    function openAt(index) {
+      current = index;
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+      slides[index].scrollIntoView({ behavior: "instant", inline: "center", block: "nearest" });
+      updateStatus();
+      document.body.style.overflow = "hidden";
+    }
+
+    function updateStatus() {
+      captionEl.textContent = captions[current] || "";
+      countEl.textContent = (current + 1) + " / " + slides.length;
+    }
+
+    function close() {
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function goTo(index) {
+      if (index < 0 || index >= slides.length) return;
+      current = index;
+      slides[index].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      updateStatus();
+    }
+
+    figs.forEach(function (fig) {
+      var idx = parseInt(fig.getAttribute("data-lightbox-index"), 10);
+      fig.addEventListener("click", function () { openAt(idx); });
+      fig.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openAt(idx); }
+      });
+    });
+
+    closeBtn.addEventListener("click", close);
+    prevBtn.addEventListener("click", function () { goTo(current - 1); });
+    nextBtn.addEventListener("click", function () { goTo(current + 1); });
+    lightbox.addEventListener("click", function (e) {
+      if (e.target === lightbox) close();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (!lightbox.classList.contains("is-open")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") goTo(current - 1);
+      if (e.key === "ArrowRight") goTo(current + 1);
+    });
+
+    // keep the counter in sync if the user scrolls the filmstrip manually
+    var scrollTimer;
+    track.addEventListener("scroll", function () {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () {
+        var trackCenter = track.scrollLeft + track.clientWidth / 2;
+        slides.forEach(function (slide, i) {
+          if (slide.offsetLeft <= trackCenter && slide.offsetLeft + slide.clientWidth > trackCenter) {
+            current = i;
+            updateStatus();
+          }
+        });
+      }, 100);
+    });
+  })();
+
+  var form = document.getElementById("notifyForm");
+  var btn = document.getElementById("notifyBtn");
+  var statusEl = document.getElementById("formStatus");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "SENDING…";
+    statusEl.textContent = "";
+    statusEl.className = "form-status";
+
+    try {
+      var res = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "Accept": "application/json" }
+      });
+      if (res.ok) {
+        statusEl.textContent = "> ok: you're on the notify list.";
+        statusEl.className = "form-status ok";
         form.reset();
       } else {
-        statusEl.textContent = "Hmm, that didn't go through — try again?";
-        statusEl.className = 'form-status err';
+        statusEl.textContent = "> error: submission failed, try again.";
+        statusEl.className = "form-status err";
       }
-    } catch(err){
-      statusEl.textContent = "Network hiccup — try again in a moment.";
-      statusEl.className = 'form-status err';
+    } catch (err) {
+      statusEl.textContent = "> error: network issue, try again.";
+      statusEl.className = "form-status err";
     }
     btn.disabled = false;
-    btn.textContent = originalLabel;
+    btn.textContent = original;
   });
-
-  /* ---------- Playable tic-tac-toe demo ---------- */
-  const gridEl = document.getElementById('tttGrid');
-  const statusText = document.getElementById('gameStatus');
-  const scoreYouEl = document.getElementById('scoreYou');
-  const scoreStrangerEl = document.getElementById('scoreStranger');
-  const resetBtn = document.getElementById('resetGame');
-
-  let board, over, scoreYou = 0, scoreStranger = 0;
-  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  const STRANGER_LINES = {
-    win: ["stranger: gg 😏","stranger: rematch??","stranger: too easy 😎"],
-    lose: ["stranger: wait what 😳","stranger: ok you're good","stranger: rematch!"],
-    draw: ["stranger: well played","stranger: draw huh","stranger: again?"]
-  };
-
-  function buildGrid(){
-    gridEl.innerHTML = '';
-    for(let i=0;i<9;i++){
-      const c = document.createElement('button');
-      c.type = 'button';
-      c.className = 'ttt-cell';
-      c.dataset.i = i;
-      c.addEventListener('click', onCellClick);
-      gridEl.appendChild(c);
-    }
-  }
-
-  function newGame(){
-    board = Array(9).fill(null);
-    over = false;
-    statusText.textContent = "Your move — you're ×";
-    [...gridEl.children].forEach(c => {
-      c.textContent = '';
-      c.className = 'ttt-cell';
-      c.disabled = false;
-    });
-  }
-
-  function checkWinner(b){
-    for(const [a,c,d] of WINS){
-      if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
-    }
-    return b.every(v => v) ? 'draw' : null;
-  }
-
-  function line(kind){
-    const arr = STRANGER_LINES[kind];
-    return arr[Math.floor(Math.random()*arr.length)];
-  }
-
-  function endGame(winner){
-    over = true;
-    [...gridEl.children].forEach(c => c.disabled = true);
-    if(winner === 'X'){
-      scoreYou++; scoreYouEl.textContent = scoreYou;
-      statusText.textContent = "You won! " + line('lose');
-    } else if(winner === 'O'){
-      scoreStranger++; scoreStrangerEl.textContent = scoreStranger;
-      statusText.textContent = "Stranger won. " + line('win');
-    } else {
-      statusText.textContent = "Draw. " + line('draw');
-    }
-  }
-
-  function strangerMove(){
-    if(over) return;
-    const empties = board.map((v,i)=>v?null:i).filter(v=>v!==null);
-    if(!empties.length) return;
-    const i = empties[Math.floor(Math.random()*empties.length)];
-    board[i] = 'O';
-    const cell = gridEl.children[i];
-    cell.textContent = '○';
-    cell.className = 'ttt-cell o';
-    cell.disabled = true;
-    const winner = checkWinner(board);
-    if(winner){ endGame(winner === 'draw' ? 'draw' : 'O'); }
-    else { statusText.textContent = "Your move — you're ×"; }
-  }
-
-  function onCellClick(e){
-    const i = Number(e.currentTarget.dataset.i);
-    if(over || board[i]) return;
-    board[i] = 'X';
-    e.currentTarget.textContent = '×';
-    e.currentTarget.className = 'ttt-cell x';
-    e.currentTarget.disabled = true;
-    const winner = checkWinner(board);
-    if(winner){ endGame(winner === 'draw' ? 'draw' : 'X'); return; }
-    statusText.textContent = "Stranger's thinking…";
-    setTimeout(strangerMove, 550);
-  }
-
-  resetBtn.addEventListener('click', newGame);
-  buildGrid();
-  newGame();
 </script>
-
-<!-- Cloudflare Web Analytics -->
-<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2bc9e63644e445ee8a2cfc9e88d63f8e"}'></script>
-<!-- End Cloudflare Web Analytics -->
 </body>
 </html>
