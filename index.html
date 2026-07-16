@@ -294,7 +294,7 @@
     <div class="content">
       <h1>Real Opponents. Real Boards. No Bots.</h1>
       <p class="lead">
-        Chichi is multiplayer board games (Tic Tac Toe, Checkers, Three Men's Morris, Sudoku) played against an
+        Chichi is multiplayer board games (Chess, Connect 4,Tic Tac Toe, Checkers, Three Men's Morris, Sudoku) played against an
         actual stranger, not a computer wearing a fake username. Live video runs alongside every match for one reason:
         it's proof you're playing a real person, not the illusion of one. This round is a closed test of the games
         themselves before we open things up further.
@@ -327,7 +327,7 @@
       </table>
 
       <div class="section-hdr" id="features">What's Being Tested: Board Games Only</div>
-      <p class="lead" style="margin-bottom:14px;">This round is scoped to the four games and the matchmaking that pairs you with a real opponent, not avatars, not leaderboards, not ranking. Click any image below to view them full size.</p>
+      <p class="lead" style="margin-bottom:14px;">This round is scoped to the 6 games and the matchmaking that pairs you with a real opponent, not avatars, not leaderboards, not ranking. Click any image below to view them full size.</p>
 
       <div class="fig-grid">
         <div class="fig" data-lightbox-index="0" tabindex="0" role="button" aria-label="Open connect screen image">
@@ -346,6 +346,14 @@
           <img src="/assets/static/sudoku.png" alt="Sudoku gameplay">
           <div class="fig-cap"><b>FIG. 4</b> Sudoku, co-op mode. Shared board state under test.</div>
         </div>
+        <div class="fig" data-lightbox-index="4" tabindex="0" role="button" aria-label="Open Chess image">
+          <img src="/assets/static/chess.png" alt="Chess gameplay">
+          <div class="fig-cap"><b>FIG. 5</b> Chess, co-op mode. Shared board state under test.</div>
+        </div>
+        <div class="fig" data-lightbox-index="5" tabindex="0" role="button" aria-label="Open Connect 4 image">
+          <img src="/assets/static/connect4.png" alt="Connect 4 gameplay">
+          <div class="fig-cap"><b>FIG. 6</b> Connect 4, co-op mode. Shared board state under test.</div>
+        </div>
       </div>
 
       <!-- Lightbox: click a thumbnail above, scroll horizontally (or use PREV/NEXT) to see the rest -->
@@ -359,10 +367,12 @@
           <div class="lightbox-slide"><img src="/assets/static/tic-tac-toe.png" alt="Tic Tac Toe gameplay"></div>
           <div class="lightbox-slide"><img src="/assets/static/checkers.png" alt="Checkers gameplay"></div>
           <div class="lightbox-slide"><img src="/assets/static/sudoku.png" alt="Sudoku gameplay"></div>
+          <div class="lightbox-slide"><img src="/assets/static/chess.png" alt="Chess gameplay"></div>
+          <div class="lightbox-slide"><img src="/assets/static/connect4.png" alt="Connect 4 gameplay"></div>
         </div>
         <div class="lightbox-nav">
           <button type="button" class="btn" id="lightboxPrev">&larr; PREV</button>
-          <span id="lightboxCount" style="font-family:'Courier New',monospace;font-size:11px;color:#cccccc;">1 / 4</span>
+          <span id="lightboxCount" style="font-family:'Courier New',monospace;font-size:11px;color:#cccccc;">1 / 6</span>
           <button type="button" class="btn" id="lightboxNext">NEXT &rarr;</button>
         </div>
       </div>
@@ -495,8 +505,8 @@
                        shows time until close. After END: button greys
                        out again automatically, no page reload needed.
      ================================================================ */
-  var TEST_START = new Date('2026-07-01T22:00:00Z');
-  var TEST_END   = new Date('2026-07-01T23:50:00Z');
+  var TEST_START = new Date('2026-07-18T14:00:00Z');
+  var TEST_END   = new Date('2026-07-18T17:00:00Z');
 
   var valueEl = document.getElementById("countdownValue");
   var noteEl = document.getElementById("countdownNote");
